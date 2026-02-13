@@ -1,7 +1,8 @@
 # qs-help-button
 
-A lightweight, self-contained solution that adds a **Help** button to the toolbar of every app in **Qlik Sense Enterprise on Windows** (client-managed).  
-Clicking the button opens a dropdown popup with configurable links — for example *Help documentation* and *Report a bug*.
+A lightweight, self-contained solution that adds a **Help** button to the toolbar of every app in **Qlik Sense Enterprise on Windows** (client-managed).
+
+Clicking the button opens a dropdown popup with configurable links — for example *Help documentation*,  *Report a bug* or a *link to any website*.
 
 ![Help button in toolbar](docs/screenshot-animated.gif)
 
