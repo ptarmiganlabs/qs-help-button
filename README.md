@@ -58,7 +58,7 @@ Clicking the button opens a dropdown popup with configurable links — for examp
 
 ## Quick Start
 
-```bash
+```powershell
 # 1. Copy the files to your Qlik Sense server
 #    (run on the Sense server or use your preferred file transfer method)
 mkdir "C:\Program Files\Qlik\Sense\Client\custom"
@@ -68,7 +68,8 @@ copy qs-help-button.config.js "C:\Program Files\Qlik\Sense\Client\custom\"
 # 2. Edit client.html — add two <script> lines before </body>
 #    See "Installation" section below for the exact snippet.
 
-# 3. Restart Qlik Sense services (the proxy caches client.html)
+# 3. Hard-refresh your browser (Ctrl+Shift+R / Cmd+Shift+R).
+#    If the button does not appear, restart the Qlik Sense services:
 Get-Service QlikSense* | Restart-Service
 ```
 
