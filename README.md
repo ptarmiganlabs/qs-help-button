@@ -3,8 +3,7 @@
 A lightweight, self-contained solution that adds a **Help** button to the toolbar of every app in **Qlik Sense Enterprise on Windows** (client-managed).  
 Clicking the button opens a dropdown popup with configurable links — for example *Help documentation* and *Report a bug*.
 
-![Help button in toolbar](docs/screenshot-button.png)  
-![Popup open](docs/screenshot-popup.png)
+![Help button in toolbar](docs/screenshot-animated.gif)
 
 ---
 
@@ -38,6 +37,7 @@ Clicking the button opens a dropdown popup with configurable links — for examp
       - [Session cookies](#session-cookies)
       - [Qlik Sense server version (requires API calls)](#qlik-sense-server-version-requires-api-calls)
       - [Current user information (requires API calls)](#current-user-information-requires-api-calls)
+  - [Hard-refresh the browser](#hard-refresh-the-browser)
   - [Troubleshooting](#troubleshooting)
   - [License](#license)
 
@@ -48,7 +48,7 @@ Clicking the button opens a dropdown popup with configurable links — for examp
 - **Single-line deployment** — only one snippet added to the Qlik Sense `client.html`
 - **Zero dependencies** — pure vanilla JavaScript, no build step, no frameworks
 - **Fully configurable** — button label, popup title, menu items, icons, URLs, and **per-item colors** are all customisable via a simple config file
-- **Professional color palette** — ships with a clean blue & yellow color scheme out of the box, fully overridable
+- **Nice color palette** — ships with a clean blue & yellow color scheme out of the box, fully overridable
 - **SPA-aware** — automatically re-injects the button when Qlik Sense navigates between apps or sheets
 - **Accessible** — proper ARIA attributes, keyboard navigation (Escape to close), focus management
 - **Upgrade-friendly** — all custom code lives in a separate `custom/` directory; only a two-line `<script>` block in `client.html` needs to be re-added after a Qlik Sense upgrade
@@ -137,8 +137,11 @@ Alternatively, restart the services via the Windows Services console (`services.
 ### Step 4 — Verify
 
 1. Open any Qlik Sense app in your browser.
-2. Look for the **Help** button in the top toolbar, to the left of the *Ask Insight Advisor* search box.
-3. Click the button — a dropdown popup should appear with your configured links.
+2. **Hard-refresh** the page to bypass the browser cache (see [Hard-refresh the browser](#hard-refresh-the-browser) below).
+3. Look for the **Help** button in the top toolbar, to the left of the *Ask Insight Advisor* search box.
+4. Click the button — a dropdown popup should appear with your configured links.
+
+> **Tip:** Whenever you update `qs-help-button.config.js` on the server, you must **hard-refresh** your browser to see the changes. If that doesn't do the trick, try restarting the Qlik Sense services too.
 
 ---
 
@@ -527,6 +530,37 @@ Example response (`info.data[0]`):
 
 ---
 
+## Hard-refresh the browser
+
+Both the Qlik Sense proxy and the browser may cache static files like `qs-help-button.config.js`. After making changes, you should first try a hard-refresh to bypass the browser cache. If that doesn't work, restart the Qlik Sense services to ensure the proxy picks up the new file.
+
+1. **Hard-refresh** the browser to bypass its local cache:
+
+   | OS | Browser | Shortcut |
+   |---|---|---|
+   | Windows / Linux | Chrome, Edge, Firefox | **Ctrl + Shift + R** or **Ctrl + F5** |
+   | macOS | Chrome, Edge, Firefox | **Cmd + Shift + R** |
+   | macOS | Safari | **Cmd + Option + R** |
+
+   Alternatively, open **DevTools** (F12) → **Network** tab → check **Disable cache** → reload the page. This is useful during development because the cache stays disabled as long as DevTools is open.
+
+2. **Restart the Qlik Sense services** on the server so the proxy picks up the new file:
+
+   ```powershell
+   # Elevated PowerShell on the Sense server
+   Get-Service QlikSense* | Restart-Service
+   ```
+
+3. **Cache-busting query string** (optional) — if the browser still serves a stale file, you can append a version parameter to the `<script>` tag in `client.html`:
+
+   ```html
+   <script src="../resources/custom/qs-help-button.config.js?v=2"></script>
+   ```
+
+   Increment the number each time you update the file.
+
+---
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
@@ -537,7 +571,7 @@ Example response (`info.data[0]`):
 | Popup opens behind other elements | z-index conflict | The popup uses `z-index: 10000`; increase if needed by editing `qs-help-button.js` |
 | Console errors about `qsHelpButtonConfig` | Config file not loaded before main script | Ensure the config `<script>` tag is **before** the main script tag (no `defer`) |
 | Scripts return HTTP 500 | Files placed in wrong directory | The `Client` folder = `/resources`. Place files at `Client\custom\`, **not** `Client\resources\custom\` |
-| Changes to config not taking effect | Browser cache | Hard-refresh (`Ctrl+Shift+R`) or add a cache-busting query string: `?v=2` |
+| Changes to config not taking effect | Browser or proxy cache | Restart the Qlik Sense services **and** hard-refresh the browser — see [Hard-refresh the browser](#hard-refresh-the-browser) |
 
 **Debug mode:** Set `debug: true` in `qs-help-button.config.js` and open the browser's developer console (F12). All script activity is logged with the prefix `[qs-help-button]`.
 
