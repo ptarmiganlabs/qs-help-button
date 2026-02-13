@@ -76,8 +76,8 @@ window.qsHelpButtonConfig = {
   //
   menuItems: [
     {
-      label: 'Help documentation',
-      url: 'https://help.example.com',
+      label: 'Help & documentation',
+      url: 'https://github.com/ptarmiganlabs/qs-help-button',
       icon: 'help',
       target: '_blank',
       // Per-item colors (blue tint)
@@ -88,7 +88,7 @@ window.qsHelpButtonConfig = {
     },
     {
       label: 'Report a bug',
-      url: 'https://bugs.example.com/report',
+      url: 'https://github.com/ptarmiganlabs/qs-help-button/issues/new/choose',
       icon: 'bug',
       target: '_blank',
       // Per-item colors (warm amber tint)
@@ -96,6 +96,17 @@ window.qsHelpButtonConfig = {
       bgColor: '#fffbeb',
       bgColorHover: '#fef3c7',
       textColor: '#78350f',
+    },
+    {
+      label:  'Ptarmigan Labs',
+      url:    'https://ptarmiganlabs.com',
+      icon:   'link',
+      target: '_blank',
+      // Per-item colors (green tint)
+      iconColor:    '#059669',
+      bgColor:      '#ecfdf5',
+      bgColorHover: '#d1fae5',
+      textColor:    '#065f46',
     },
     // -- Examples of additional items you can add: --
     // {
