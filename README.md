@@ -83,7 +83,7 @@ Get-Service QlikSense* | Restart-Service
 |---|---|
 | Qlik Sense Enterprise on Windows | Client-managed deployment (not Qlik Cloud) |
 | Server access | Administrator / RDP access to the Qlik Sense server |
-| Qlik Sense version | Tested with sense-client **8.527.x**; expected to work with most modern versions |
+| Qlik Sense version | Tested with client-managed Qlik Sense 2025-Nov-IR, 2025-Nov-patch3; expected to work with most modern versions |
 
 ### Step 1 — Copy files to the Sense server
 
