@@ -29,6 +29,27 @@ Current available variants:
   * Flexible authentication: no auth, custom header, Sense session passthrough, or arbitrary headers.
   * Zero dependencies, vanilla JavaScript.
 
+## Template Fields
+
+Both variants support **template fields** — dynamic `{{…}}` placeholders in URLs that are resolved at click time using live Qlik Sense context. This enables context-sensitive help, such as directing users to app-specific or sheet-specific documentation pages.
+
+Supported fields: `{{userDirectory}}`, `{{userId}}`, `{{appId}}`, `{{sheetId}}`.
+
+Example:
+
+```js
+menuItems: [
+  {
+    label: 'Help for this app',
+    url: 'https://wiki.example.com/qlik/apps/{{appId}}',
+    icon: 'help',
+    target: '_blank',
+  },
+]
+```
+
+See [docs/template-fields.md](./docs/template-fields.md) for full documentation including all supported fields, fallback behaviour, and configuration examples.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

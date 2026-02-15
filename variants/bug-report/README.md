@@ -64,6 +64,7 @@ Clicking the button opens a dropdown popup with:
 - **Single-line deployment** — only one snippet added to the Qlik Sense `client.html`
 - **Zero dependencies** — pure vanilla JavaScript, no build step, no frameworks
 - **Fully configurable** — button label, popup title, menu items, icons, URLs, dialog title, webhook URL, auth, context fields, and all colors are customisable
+- **Template fields** — use `{{appId}}`, `{{sheetId}}`, `{{userId}}`, `{{userDirectory}}` placeholders in menu item URLs and the webhook URL for context-sensitive help links (see [Template Fields](../../docs/template-fields.md))
 - **SPA-aware** — automatically re-injects the button when Qlik Sense navigates between apps or sheets
 - **Accessible** — proper ARIA attributes, keyboard navigation (Escape to close), focus management
 - **Upgrade-friendly** — all custom code lives in a separate `custom/` directory
@@ -225,6 +226,32 @@ Each entry in `menuItems` is either a **link item** or a **bug-report action ite
 ```
 
 Set `action: 'bugReport'` on any menu item to make it open the dialog. You can have multiple link items and one bug-report item (or none — the dialog feature is opt-in via the action property).
+
+### Template fields in URLs
+
+URLs in `menuItems` and in `bugReport.webhookUrl` can contain `{{…}}` placeholders that are resolved dynamically at click time using Qlik Sense context. This enables context-sensitive help links — for example, directing users to an app-specific documentation page.
+
+| Placeholder | Description | Example value |
+|---|---|---|
+| `{{userDirectory}}` | User directory | `CORP` |
+| `{{userId}}` | User ID | `jsmith` |
+| `{{appId}}` | Current app GUID | `4634fbc8-65eb-4aff-a686-…` |
+| `{{sheetId}}` | Current sheet ID | `tAyTET` or `b8f5e231-…` |
+
+Example:
+
+```js
+{
+  label: 'Help for this app',
+  url:   'https://wiki.example.com/qlik/apps/{{appId}}',
+  icon:  'help',
+  target: '_blank',
+}
+```
+
+If a field is unavailable (e.g. `{{sheetId}}` when no sheet is open), it resolves to an empty string and any resulting double slashes in the URL path are collapsed.
+
+See [Template Fields documentation](../../docs/template-fields.md) for full details, examples, and fallback behaviour.
 
 ### Bug Report settings
 

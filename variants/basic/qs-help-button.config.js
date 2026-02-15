@@ -74,6 +74,14 @@ window.qsHelpButtonConfig = {
   //   bgColorHover (string)  — Background color on hover
   //   textColor    (string)  — Text color
   //
+  // Template fields: URLs can contain {{…}} placeholders that are resolved
+  // dynamically at click time using Qlik Sense context:
+  //   {{userDirectory}} — User directory (e.g. "CORP")
+  //   {{userId}}        — User ID (e.g. "jsmith")
+  //   {{appId}}         — Current app GUID
+  //   {{sheetId}}       — Current sheet ID
+  // See docs/template-fields.md for full documentation.
+  //
   menuItems: [
     {
       label: 'Help & documentation',
@@ -109,6 +117,16 @@ window.qsHelpButtonConfig = {
       textColor:    '#065f46',
     },
     // -- Examples of additional items you can add: --
+    // {                                    // ← Template field example
+    //   label:  'App-specific help',
+    //   url:    'https://help.example.com/apps/{{appId}}/sheets/{{sheetId}}',
+    //   icon:   'info',
+    //   target: '_blank',
+    //   iconColor:    '#7c3aed',
+    //   bgColor:      '#f5f3ff',
+    //   bgColorHover: '#ede9fe',
+    //   textColor:    '#5b21b6',
+    // },
     // {
     //   label:  'Contact support',
     //   url:    'mailto:support@example.com',

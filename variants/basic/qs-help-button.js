@@ -185,6 +185,82 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Template field support — dynamic URL placeholders
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Cached template context. User directory and user ID are fetched once at
+   * init time from the Qlik Sense proxy API. App ID and sheet ID are parsed
+   * from the current URL at resolution time (they change on SPA navigation).
+   */
+  var _templateContext = { userDirectory: '', userId: '' };
+
+  /**
+   * Fetch user info from the Qlik Sense proxy API and cache it for template
+   * resolution. Called once at startup — fire-and-forget. If the fetch fails,
+   * user-related template fields will resolve to empty strings.
+   */
+  function fetchTemplateContext() {
+    fetch('/qps/user?targetUri=' + encodeURIComponent(window.location.href))
+      .then(function (resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.json();
+      })
+      .then(function (data) {
+        _templateContext.userDirectory = data.userDirectory || '';
+        _templateContext.userId = data.userId || '';
+        log('Template context loaded:', JSON.stringify(_templateContext));
+      })
+      .catch(function (err) {
+        log('Failed to fetch template context (user info):', err);
+      });
+  }
+
+  /**
+   * Replace {{…}} template placeholders in a URL with live Qlik Sense context.
+   *
+   * Supported fields:
+   *   {{userDirectory}} — User directory (e.g. "CORP")
+   *   {{userId}}        — User ID (e.g. "jsmith")
+   *   {{appId}}         — Current app GUID (from URL)
+   *   {{sheetId}}       — Current sheet ID (from URL)
+   *
+   * Unresolvable placeholders are replaced with an empty string and any
+   * resulting double-slashes in the URL path are collapsed to a single slash.
+   *
+   * @param {string} url — URL string, possibly containing {{…}} placeholders.
+   * @returns {string} Resolved URL.
+   */
+  function resolveTemplateFields(url) {
+    if (!url || url.indexOf('{{') < 0) return url;
+
+    // Parse app/sheet IDs fresh from the current URL (changes on SPA navigation)
+    var path = location.pathname;
+    var appMatch = path.match(/\/app\/([0-9a-f-]{36})/i);
+    var sheetMatch = path.match(/\/sheet\/([^\/]+)/);
+
+    var resolved = url
+      .replace(/\{\{userDirectory\}\}/g, _templateContext.userDirectory || '')
+      .replace(/\{\{userId\}\}/g, _templateContext.userId || '')
+      .replace(/\{\{appId\}\}/g, appMatch ? appMatch[1] : '')
+      .replace(/\{\{sheetId\}\}/g, sheetMatch ? sheetMatch[1] : '');
+
+    // Clean up double-slashes in the path portion (preserve the :// in protocol)
+    var protocolEnd = resolved.indexOf('://');
+    if (protocolEnd >= 0) {
+      var protocol = resolved.substring(0, protocolEnd + 3);
+      var rest = resolved.substring(protocolEnd + 3);
+      rest = rest.replace(/\/{2,}/g, '/');
+      resolved = protocol + rest;
+    } else {
+      resolved = resolved.replace(/\/{2,}/g, '/');
+    }
+
+    log('Template URL resolved:', url, '→', resolved);
+    return resolved;
+  }
+
+  // ---------------------------------------------------------------------------
   // Dynamic style builder — uses config colors
   // ---------------------------------------------------------------------------
   function buildStyles() {
@@ -382,9 +458,25 @@
       var hoverAddition = menuItemHoverStyle(item);
 
       var a = document.createElement('a');
-      a.setAttribute('href', item.url || '#');
-      a.setAttribute('target', item.target || '_blank');
-      a.setAttribute('rel', 'noopener noreferrer');
+      var itemUrl = item.url || '#';
+      var itemTarget = item.target || '_blank';
+
+      // If URL contains {{…}} template fields, resolve them at click time
+      if (itemUrl.indexOf('{{') >= 0) {
+        a.setAttribute('href', '#');
+        (function (tplUrl, tplTarget) {
+          a.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var resolved = resolveTemplateFields(tplUrl);
+            window.open(resolved, tplTarget, 'noopener,noreferrer');
+          });
+        })(itemUrl, itemTarget);
+      } else {
+        a.setAttribute('href', itemUrl);
+        a.setAttribute('target', itemTarget);
+        a.setAttribute('rel', 'noopener noreferrer');
+      }
       a.setAttribute('role', 'menuitem');
       a.setAttribute('style', baseStyle);
       a.innerHTML =
@@ -547,10 +639,12 @@
   // ---------------------------------------------------------------------------
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
+      fetchTemplateContext();
       init();
       watchForRemoval();
     });
   } else {
+    fetchTemplateContext();
     init();
     watchForRemoval();
   }

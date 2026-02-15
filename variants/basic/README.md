@@ -49,6 +49,7 @@ Clicking the button opens a dropdown popup with configurable links — for examp
 - **Single-line deployment** — only one snippet added to the Qlik Sense `client.html`
 - **Zero dependencies** — pure vanilla JavaScript, no build step, no frameworks
 - **Fully configurable** — button label, popup title, menu items, icons, URLs, and **per-item colors** are all customisable via a simple config file
+- **Template fields** — use `{{appId}}`, `{{sheetId}}`, `{{userId}}`, `{{userDirectory}}` placeholders in URLs for context-sensitive help links (see [Template Fields](../../docs/template-fields.md))
 - **Nice color palette** — ships with a clean blue & yellow color scheme out of the box, fully overridable
 - **SPA-aware** — automatically re-injects the button when Qlik Sense navigates between apps or sheets
 - **Accessible** — proper ARIA attributes, keyboard navigation (Escape to close), focus management
@@ -250,6 +251,32 @@ The default config ships with two example items demonstrating per-item theming:
 | `info` | Info circle |
 | `mail` | Envelope |
 | `link` | Chain link |
+
+### Template fields in URLs
+
+URLs in `menuItems` can contain `{{…}}` placeholders that are resolved dynamically at click time using Qlik Sense context. This enables context-sensitive help links — for example, directing users to an app-specific documentation page.
+
+| Placeholder | Description | Example value |
+|---|---|---|
+| `{{userDirectory}}` | User directory | `CORP` |
+| `{{userId}}` | User ID | `jsmith` |
+| `{{appId}}` | Current app GUID | `4634fbc8-65eb-4aff-a686-…` |
+| `{{sheetId}}` | Current sheet ID | `tAyTET` or `b8f5e231-…` |
+
+Example:
+
+```js
+{
+  label: 'Help for this app',
+  url:   'https://wiki.example.com/qlik/apps/{{appId}}',
+  icon:  'help',
+  target: '_blank',
+}
+```
+
+If a field is unavailable (e.g. `{{sheetId}}` when no sheet is open), it resolves to an empty string and any resulting double slashes in the URL path are collapsed.
+
+See [Template Fields documentation](../../docs/template-fields.md) for full details, examples, and fallback behaviour.
 
 ---
 
