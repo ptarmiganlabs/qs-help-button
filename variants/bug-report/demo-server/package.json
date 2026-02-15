@@ -1,0 +1,25 @@
+{
+  "name": "qs-help-button-demo-server",
+  "version": "1.0.0",
+  "description": "Demo backend server for receiving bug reports from the qs-help-button Bug Report variant",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "qlik-sense",
+    "help-button",
+    "bug-report",
+    "demo"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.2",
+    "winston": "^3.17.0"
+  }
+}

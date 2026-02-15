@@ -114,11 +114,13 @@ window.qsHelpButtonConfig = {
     /**
      * REQUIRED — The URL to POST the bug report JSON payload to.
      * Examples:
-     *   'https://hooks.example.com/services/T00/B00/xxx'     (Slack/Teams)
+     *   'http://localhost:3000/api/bug-reports'               (demo server)
+     *   'https://localhost:3443/api/bug-reports'              (demo server)
+     *   'https://hooks.example.com/services/T00/B00/xxx'      (Slack/Teams)
      *   'https://jira.example.com/rest/api/2/issue'           (Jira)
      *   'https://your-server.com/api/bug-reports'             (custom REST)
      */
-    webhookUrl: 'https://httpbin.org/post',
+    webhookUrl: 'https://localhost:3443/api/bug-reports',
 
     /** HTTP method for the webhook call (default: POST) */
     webhookMethod: 'POST',

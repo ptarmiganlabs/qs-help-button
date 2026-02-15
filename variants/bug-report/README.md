@@ -37,6 +37,11 @@ Clicking the button opens a dropdown popup with:
     - [Payload schema](#payload-schema)
     - [Example payload](#example-payload)
     - [Tested webhook targets](#tested-webhook-targets)
+  - [Demo Server](#demo-server)
+    - [Quick start](#quick-start-1)
+    - [Configuring the help button to use the demo server](#configuring-the-help-button-to-use-the-demo-server)
+    - [Example console output](#example-console-output)
+    - [Beyond the demo](#beyond-the-demo)
   - [Upgrading Qlik Sense](#upgrading-qlik-sense)
   - [How It Works — Technical Deep Dive](#how-it-works--technical-deep-dive)
     - [Architecture overview](#architecture-overview)
@@ -381,6 +386,51 @@ When the user submits a bug report, a JSON payload is POSTed to the configured `
 | Jira (REST API v2) | Use `auth.type: 'header'` with a Basic or Bearer token; the payload needs reshaping for Jira's issue format |
 | ServiceNow | Use `auth.type: 'header'` with appropriate credentials |
 | Custom Node.js / Python service | Full control over payload processing, storage, and notifications |
+
+---
+
+## Demo Server
+
+A fully functional Node.js backend is included in the `demo-server/` directory. It receives bug reports from the help button and logs them to the console with timestamps, using [Winston](https://github.com/winstonjs/winston) for structured logging.
+
+The demo server supports both **HTTP** and **HTTPS** modes. When TLS certificates are present it starts in HTTPS mode automatically — this is required when the help button runs inside Qlik Sense (which serves pages over HTTPS).
+
+> **Full documentation:** See [demo-server/README.md](./demo-server/README.md) for complete setup instructions, including how to generate self-signed certificates on **macOS** and **Windows PowerShell 5.1**, how to trust the certificate in your browser, configuration reference, testing examples, and troubleshooting.
+
+### Quick start
+
+```bash
+# From the bug-report variant directory:
+cd demo-server
+npm install
+
+# Generate a self-signed certificate (macOS / Linux)
+mkdir -p certs
+openssl req -x509 -newkey rsa:2048 -nodes \
+  -keyout certs/key.pem -out certs/cert.pem \
+  -days 365 -subj "/CN=localhost" \
+  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+
+# Start the server (auto-detects certs → HTTPS on port 3443)
+npm start
+```
+
+Then open `https://localhost:3443/health` in your browser and accept the self-signed certificate warning. This one-time step allows `fetch()` calls from Qlik Sense to reach the demo server.
+
+### Example console output
+
+When a user submits a bug report from the Qlik Sense help button, the demo server logs:
+
+```
+2026-02-14T14:22:33.456Z info: ────────────────────────────────────────────────────────────────────────
+2026-02-14T14:22:33.456Z info: BUG REPORT received at 2026-02-14T14:22:33.123Z
+2026-02-14T14:22:33.456Z info:   User:      Göran Sander (LAB\goran)
+2026-02-14T14:22:33.456Z info:   Version:   November 2025 (v14.254.6)
+2026-02-14T14:22:33.456Z info:   App:       4634fbc8-65eb-4aff-a686-34e75326e534
+2026-02-14T14:22:33.456Z info:   Sheet:     tAyTET
+2026-02-14T14:22:33.456Z info:   Description: The bar chart on this sheet shows incorrect values for Q4 2025…
+2026-02-14T14:22:33.456Z info: ────────────────────────────────────────────────────────────────────────
+```
 
 ---
 

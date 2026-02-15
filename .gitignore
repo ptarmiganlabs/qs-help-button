@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 
 # Project specific ignores
 .playwright-mcp/
+
+# TLS certificates (self-signed keys must never be committed)
+**/certs/*.pem
