@@ -14,7 +14,7 @@ jobs:
       release_upload_url: ${{ steps.release.outputs['upload_url'] }}
     env:
       GITHUB_REF: ${{ github.ref }}
-      GITHUB_TOKEN: ${{ secrets.PAT }}
+      GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_PAT }}
     steps:
       - name: Show github.ref
         run: echo "$GITHUB_REF"
@@ -95,7 +95,7 @@ jobs:
           omitNameDuringUpdate: true
           omitDraftDuringUpdate: true
           tag: ${{ needs.release-please.outputs.release_tag_name }}
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.RELEASE_PLEASE_PAT }}
           artifacts: |
             ${{ env.DIST_FILE_NAME }}-basic-v${{ needs.release-please.outputs.release_version }}.zip
             ${{ env.DIST_FILE_NAME }}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip
