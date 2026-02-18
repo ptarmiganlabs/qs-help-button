@@ -1,0 +1,82 @@
+name: "\u23EE\uFE0F Regression report"
+description: Report a bug not seen in an earlier version of qs-help-button
+labels: 'template: regression'
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to file a regression report! Please fill out this form as completely as possible.
+  - type: markdown
+    attributes:
+      value: 'Please first search the repository for similar issues and discussions.'
+  - type: dropdown
+    attributes:
+      label: Which variant are you using?
+      options:
+        - basic
+        - bug-report
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What version of qs-help-button are you using?
+      description: 'Check the @version tag at the top of qs-help-button.js — for example: 2.1.0'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Which version(s) of qs-help-button work for you?
+      description: 'The last version where the issue did not occur — for example: 2.0.0'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What Qlik Sense version are you using?
+      description: 'For example: 2025 November IR (8.527.8)'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What browser are you using?
+      description: 'For example: Chrome 120, Edge 120, Firefox 121'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What operating system are you using?
+      description: 'For example: Windows 11, Windows Server 2022'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior. Screenshots can be provided in the issue body below.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Configuration
+      description: Paste relevant parts of your qs-help-button.config.js (redact any sensitive URLs or tokens).
+      render: javascript
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: Before posting the issue go through the steps you've written down to make sure the steps provided are detailed and clear.
+  - type: markdown
+    attributes:
+      value: Contributors should be able to follow the steps provided in order to reproduce the bug.
+  - type: markdown
+    attributes:
+      value: These steps are used to add integration tests to ensure the same issue does not happen again. Thanks in advance!

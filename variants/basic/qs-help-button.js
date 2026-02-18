@@ -18,7 +18,7 @@
  * Tested with versions
  *   - 8.527.8 (2025 November, IR)
  *
- * @version 2.0.0
+ * @version 1.0.0 // x-release-please-version
  * @license MIT
  * @see https://github.com/ptarmiganlabs/qs-help-button
  */

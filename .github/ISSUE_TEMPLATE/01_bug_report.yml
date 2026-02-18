@@ -1,0 +1,76 @@
+name: "\U0001F41E Bug Report"
+description: Create a bug report for qs-help-button
+labels: 'template: bug'
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to file a bug report! Please fill out this form as completely as possible.
+  - type: markdown
+    attributes:
+      value: 'Please first search the repository for similar issues and discussions.'
+  - type: dropdown
+    attributes:
+      label: Which variant are you using?
+      options:
+        - basic
+        - bug-report
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What version of qs-help-button are you using?
+      description: 'Check the @version tag at the top of qs-help-button.js — for example: 2.0.0'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What Qlik Sense version are you using?
+      description: 'For example: 2025 November IR (8.527.8)'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What browser are you using?
+      description: 'For example: Chrome 120, Edge 120, Firefox 121'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What operating system are you using?
+      description: 'For example: Windows 11, Windows Server 2022'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior. Screenshots can be provided in the issue body below.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Configuration
+      description: Paste relevant parts of your qs-help-button.config.js (redact any sensitive URLs or tokens).
+      render: javascript
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: Before posting the issue go through the steps you've written down to make sure the steps provided are detailed and clear.
+  - type: markdown
+    attributes:
+      value: Contributors should be able to follow the steps provided in order to reproduce the bug.
+  - type: markdown
+    attributes:
+      value: The information you enter on this page will be used to improve and enhance this project. Thanks in advance!

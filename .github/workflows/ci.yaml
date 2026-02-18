@@ -1,0 +1,101 @@
+name: ci
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      release_tag_name: ${{ steps.release.outputs['tag_name'] }}
+      release_version: ${{ steps.release.outputs['version'] }}
+      release_upload_url: ${{ steps.release.outputs['upload_url'] }}
+    env:
+      GITHUB_REF: ${{ github.ref }}
+      GITHUB_TOKEN: ${{ secrets.PAT }}
+    steps:
+      - name: Show github.ref
+        run: echo "$GITHUB_REF"
+
+      - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4.4.0
+        id: release
+        if: github.repository_owner == 'ptarmiganlabs'
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_PAT }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          target-branch: main
+
+      - name: Show output from Release-Please
+        if: always()
+        env:
+          RELEASE_PLEASE_OUTPUT: ${{ toJSON(steps.release.outputs) }}
+        run: echo "$RELEASE_PLEASE_OUTPUT"
+
+      - name: Show output from Release-Please
+        run: |
+          echo "releases_created: ${{ steps.release.outputs.releases_created }}"
+          echo "release_created : ${{ steps.release.outputs.release_created }}"
+          echo "draft           : ${{ steps.release.outputs['draft'] }}"
+          echo "path            : ${{ steps.release.outputs['path'] }}"
+          echo "upload_url      : ${{ steps.release.outputs['upload_url'] }}"
+          echo "html_url        : ${{ steps.release.outputs['html_url'] }}"
+          echo "tag_name        : ${{ steps.release.outputs['tag_name'] }}"
+          echo "version         : ${{ steps.release.outputs['version'] }}"
+          echo "major           : ${{ steps.release.outputs['major'] }}"
+          echo "minor           : ${{ steps.release.outputs['minor'] }}"
+          echo "patch           : ${{ steps.release.outputs['patch'] }}"
+          echo "sha             : ${{ steps.release.outputs['sha'] }}"
+
+  build-release:
+    needs: release-please
+    runs-on: ubuntu-latest
+    if: needs.release-please.outputs.releases_created == 'true'
+    permissions:
+      contents: write
+    env:
+      DIST_FILE_NAME: qs-help-button
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Create basic variant zip
+        run: |
+          cd variants/basic
+          zip -j "../../${DIST_FILE_NAME}-basic-v${{ needs.release-please.outputs.release_version }}.zip" \
+            qs-help-button.js \
+            qs-help-button.config.js \
+            loader-snippet.html \
+            README.md
+
+      - name: Create bug-report variant zip
+        run: |
+          cd variants/bug-report
+          zip -j "../../${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip" \
+            qs-help-button.js \
+            qs-help-button.config.js \
+            loader-snippet.html \
+            README.md
+
+      - name: List zip contents (debug)
+        run: |
+          echo "=== Basic variant ==="
+          zipinfo "${DIST_FILE_NAME}-basic-v${{ needs.release-please.outputs.release_version }}.zip"
+          echo ""
+          echo "=== Bug-report variant ==="
+          zipinfo "${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip"
+
+      - name: Upload release artifacts
+        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitDraftDuringUpdate: true
+          tag: ${{ needs.release-please.outputs.release_tag_name }}
+          token: ${{ secrets.PAT }}
+          artifacts: |
+            ${{ env.DIST_FILE_NAME }}-basic-v${{ needs.release-please.outputs.release_version }}.zip
+            ${{ env.DIST_FILE_NAME }}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip

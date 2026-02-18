@@ -1,0 +1,61 @@
+{
+    "release-type": "node",
+    "prerelease": false,
+    "draft": true,
+    "release-search-depth": 10,
+    "commit-search-depth": 200,
+    "changelog-sections": [
+        {
+            "type": "feat",
+            "section": "Features",
+            "hidden": false
+        },
+        {
+            "type": "fix",
+            "section": "Bug Fixes",
+            "hidden": false
+        },
+        {
+            "type": "chore",
+            "section": "Miscellaneous",
+            "hidden": false
+        },
+        {
+            "type": "refactor",
+            "section": "Refactoring",
+            "hidden": false
+        },
+        {
+            "type": "docs",
+            "section": "Documentation",
+            "hidden": false
+        },
+        {
+            "type": "build",
+            "section": "Miscellaneous",
+            "hidden": false
+        },
+        {
+            "type": "test",
+            "section": "Miscellaneous",
+            "hidden": false
+        }
+    ],
+    "extra-files": [
+        {
+            "type": "generic",
+            "path": "variants/basic/qs-help-button.js",
+            "glob": false
+        },
+        {
+            "type": "generic",
+            "path": "variants/bug-report/qs-help-button.js",
+            "glob": false
+        }
+    ],
+    "packages": {
+        ".": {
+            "package-name": "qs-help-button"
+        }
+    }
+}

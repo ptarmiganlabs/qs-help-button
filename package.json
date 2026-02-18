@@ -1,0 +1,24 @@
+{
+  "name": "qs-help-button",
+  "version": "1.0.0",
+  "description": "Configurable help button for Qlik Sense Enterprise (client-managed) toolbar",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ptarmiganlabs/qs-help-button.git"
+  },
+  "homepage": "https://github.com/ptarmiganlabs/qs-help-button",
+  "bugs": {
+    "url": "https://github.com/ptarmiganlabs/qs-help-button/issues"
+  },
+  "author": "Göran Sander, Ptarmigan Labs",
+  "keywords": [
+    "qlik",
+    "qliksense",
+    "help-button",
+    "toolbar",
+    "extension",
+    "ptarmiganlabs"
+  ]
+}

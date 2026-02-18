@@ -1,4 +1,4 @@
-# qs-help-button
+# qs-help-button — Basic Variant
 
 A lightweight, self-contained solution that adds a **Help** button to the toolbar of every app in **Qlik Sense Enterprise on Windows** (client-managed).
 
@@ -10,7 +10,7 @@ Clicking the button opens a dropdown popup with configurable links — for examp
 
 ## Table of Contents
 
-- [qs-help-button](#qs-help-button)
+- [qs-help-button — Basic Variant](#qs-help-button--basic-variant)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [Quick Start](#quick-start)
@@ -27,6 +27,7 @@ Clicking the button opens a dropdown popup with configurable links — for examp
     - [Adding more menu items](#adding-more-menu-items)
     - [Per-item colors](#per-item-colors)
     - [Available icons](#available-icons)
+    - [Template fields in URLs](#template-fields-in-urls)
   - [Upgrading Qlik Sense](#upgrading-qlik-sense)
   - [How It Works — Technical Deep Dive](#how-it-works--technical-deep-dive)
     - [Architecture overview](#architecture-overview)
