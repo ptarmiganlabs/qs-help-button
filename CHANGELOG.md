@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.1](https://github.com/ptarmiganlabs/qs-help-button/compare/qs-help-button-v1.2.0...qs-help-button-v1.2.1) (2026-02-23)
+
+
+### Bug Fixes
+
+* Set permissions in CI workdflow ([a7c190f](https://github.com/ptarmiganlabs/qs-help-button/commit/a7c190f6712520624c9857eec541339f08321aa5))
+
+
+### Documentation
+
+* add note about logging cert paths for demo purposes ([74be60d](https://github.com/ptarmiganlabs/qs-help-button/commit/74be60d291665cf172781e73df6f6a896dd6e1de))
+
 ## [1.2.0](https://github.com/ptarmiganlabs/qs-help-button/compare/qs-help-button-v1.1.0...qs-help-button-v1.2.0) (2026-02-18)
 
 
