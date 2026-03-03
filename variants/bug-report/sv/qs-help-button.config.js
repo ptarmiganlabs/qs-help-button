@@ -44,7 +44,7 @@ window.qsHelpButtonConfig = {
   // --------------------------------------------------------------------------
 
   /** Rubrik som visas högst upp i popup-menyn */
-  popupTitle: 'Behöver du hjälp?',
+  popupTitle: 'Hur kan vi hjälpa dig?',
 
   /** Popup-färger — mörkblå rubrik med gul text */
   popupStyle: {
