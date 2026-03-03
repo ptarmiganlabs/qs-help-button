@@ -63,7 +63,7 @@ Clicking the button opens a dropdown popup with:
 - **Success/error feedback** — a toast notification confirms whether the submission succeeded or failed
 - **Single-line deployment** — only one snippet added to the Qlik Sense `client.html`
 - **Zero dependencies** — pure vanilla JavaScript, no build step, no frameworks
-- **Fully configurable** — button label, popup title, menu items, icons, URLs, dialog title, webhook URL, auth, context fields, and all colors are customisable
+- **Fully configurable** — button label, popup title, menu items, icons, URLs, dialog title, webhook URL, auth, context fields, all dialog texts, and all colors are customisable (supports localisation)
 - **Template fields** — use `{{appId}}`, `{{sheetId}}`, `{{userId}}`, `{{userDirectory}}` placeholders in menu item URLs and the webhook URL for context-sensitive help links (see [Template Fields](../../docs/template-fields.md))
 - **SPA-aware** — automatically re-injects the button when Qlik Sense navigates between apps or sheets
 - **Accessible** — proper ARIA attributes, keyboard navigation (Escape to close), focus management
@@ -267,6 +267,13 @@ The `bugReport` object controls the bug-report dialog and webhook submission:
 | `descriptionPlaceholder` | string | `'Describe the issue…'` | Placeholder text for the description field |
 | `successMessage` | string | `'Bug report submitted successfully!'` | Toast message on success |
 | `errorMessage` | string | `'Failed to submit bug report.'` | Toast message on failure |
+| `descriptionLabel` | string | `'Description *'` | Label above the description textarea |
+| `cancelButtonText` | string | `'Cancel'` | Text on the Cancel button |
+| `submitButtonText` | string | `'Submit'` | Text on the Submit button |
+| `submittingButtonText` | string | `'Submitting…'` | Text shown while the report is being sent |
+| `loadingMessage` | string | `'Gathering environment info…'` | Text shown while loading context |
+| `closeDialogAriaLabel` | string | `'Close dialog'` | Aria-label for the close (×) button |
+| `fieldLabels` | object | `{ userId: 'User ID', … }` | Labels for each context field in the dialog |
 | `dialogStyle` | object | *(see below)* | Dialog color/style overrides |
 
 ### Authentication options
