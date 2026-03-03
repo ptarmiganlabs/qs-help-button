@@ -67,20 +67,34 @@ jobs:
       - name: Create basic variant zip
         run: |
           cd variants/basic
-          zip -j "../../${DIST_FILE_NAME}-basic-v${{ needs.release-please.outputs.release_version }}.zip" \
-            qs-help-button.js \
-            qs-help-button.config.js \
-            loader-snippet.html \
-            README.md
+          zip -r "../../${DIST_FILE_NAME}-basic-v${{ needs.release-please.outputs.release_version }}.zip" \
+            README.md \
+            da \
+            de \
+            en \
+            es \
+            fi \
+            fr \
+            no \
+            pl \
+            sv \
+            -x "*/demo-server/*" "*/node_modules/*"
 
       - name: Create bug-report variant zip
         run: |
           cd variants/bug-report
-          zip -j "../../${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip" \
-            qs-help-button.js \
-            qs-help-button.config.js \
-            loader-snippet.html \
-            README.md
+          zip -r "../../${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip" \
+            README.md \
+            da \
+            de \
+            en \
+            es \
+            fi \
+            fr \
+            no \
+            pl \
+            sv \
+            -x "demo-server/node_modules/*" "*/demo-server/node_modules/*"
 
       - name: List zip contents (debug)
         run: |
