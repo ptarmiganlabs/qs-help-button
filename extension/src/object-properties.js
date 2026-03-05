@@ -10,6 +10,14 @@ export default {
     subtitle: '',
     footnote: '',
 
+    // -- Widget (grid cell) appearance --
+    widget: {
+        hideHoverMenu: false,
+        hideContextMenu: false,
+        showAnalysisPlaceholder: true,
+        analysisPlaceholderText: '',
+    },
+
     // -- Toolbar button --
     buttonLabel: '',
     buttonTooltip: '',

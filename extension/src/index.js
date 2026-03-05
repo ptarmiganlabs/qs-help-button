@@ -24,7 +24,8 @@ import { injectHelpButton, destroyHelpButton } from './ui/toolbar-injector';
 import { makeSvg } from './ui/icons';
 import { fetchTemplateContext } from './util/template-fields';
 import { resolveText } from './i18n/index';
-import logger from './util/logger';
+import { escapeHtml } from './util/template-fields';
+import logger, { PACKAGE_VERSION } from './util/logger';
 import './style.css';
 
 export default function supernova(galaxy) {
@@ -101,19 +102,125 @@ export default function supernova(galaxy) {
                     // Edit mode: show a placeholder inside the extension cell
                     renderEditPlaceholder(element, layout);
 
+                    // Responsive size tiers via ResizeObserver
+                    const widgetEl = element.querySelector('.qshb-edit-placeholder');
+                    let resizeObserver;
+                    if (widgetEl && typeof ResizeObserver !== 'undefined') {
+                        const classify = () => {
+                            const h = widgetEl.clientHeight;
+                            const w = widgetEl.clientWidth;
+                            let size = 'md';
+                            if (h < 80) size = 'xs';
+                            else if (h < 160) size = 'sm';
+                            widgetEl.setAttribute('data-size', size);
+                            widgetEl.setAttribute('data-narrow', w < 160 ? 'true' : 'false');
+                        };
+                        resizeObserver = new ResizeObserver(classify);
+                        resizeObserver.observe(widgetEl);
+                        classify();
+                    }
+
+                    // Attach About button handler
+                    const aboutBtn = element.querySelector('.qshb-about-btn');
+                    if (aboutBtn) {
+                        aboutBtn.addEventListener('click', () => openAboutModal());
+                    }
+
                     // Remove toolbar button while editing (clear config so watcher won't re-inject)
                     destroyHelpButton({ clearConfig: true });
-                    return;
+
+                    return () => {
+                        if (resizeObserver) resizeObserver.disconnect();
+                    };
                 }
 
-                // Analysis mode: inject toolbar button + show minimal placeholder in cell
-                renderAnalysisPlaceholder(element);
+                // Analysis mode: inject toolbar button + show placeholder in cell
+                renderAnalysisPlaceholder(element, layout);
 
                 injectHelpButton(layout, adapter, platform);
                 // No cleanup returned — the button is a page-level singleton
                 // that must survive component unmount on sheet navigation.
                 // injectHelpButton() handles updates via its double-injection guard.
                 // watchForRemoval() handles re-injection after SPA navigation.
+
+                // --- Context menu & hover menu visibility overrides ---
+                const hideContextMenu = layout.widget?.hideContextMenu === true;
+                const hideHoverMenu = layout.widget?.hideHoverMenu === true;
+
+                const qlikWrapper =
+                    element.closest('.qv-gridcell') ||
+                    element.closest('.qv-object') ||
+                    element.parentElement ||
+                    element;
+
+                // Context menu: suppress via capture-phase listener + MutationObserver
+                let contextMenuHandler;
+                let contextMenuObserver;
+                let rightClickTimer;
+                if (hideContextMenu) {
+                    let recentRightClick = false;
+
+                    contextMenuHandler = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        recentRightClick = true;
+                        clearTimeout(rightClickTimer);
+                        rightClickTimer = setTimeout(() => {
+                            recentRightClick = false;
+                        }, 500);
+                    };
+                    qlikWrapper.addEventListener('contextmenu', contextMenuHandler, true);
+
+                    contextMenuObserver = new MutationObserver((mutations) => {
+                        if (!recentRightClick) return;
+                        for (const mutation of mutations) {
+                            for (const node of mutation.addedNodes) {
+                                if (node.nodeType !== 1) continue;
+                                // Client-managed context menu
+                                const qvContextMenu = node.classList?.contains('qv-contextmenu')
+                                    ? node
+                                    : node.querySelector?.('.qv-contextmenu');
+                                if (qvContextMenu) {
+                                    qvContextMenu.remove();
+                                    recentRightClick = false;
+                                    return;
+                                }
+                                // Cloud context menu (React portal)
+                                const cloudMenu =
+                                    node.getAttribute?.('data-testid') === 'qmfe-menu'
+                                        ? node
+                                        : node.querySelector?.('[data-testid="qmfe-menu"]');
+                                if (cloudMenu) {
+                                    cloudMenu.remove();
+                                    recentRightClick = false;
+                                    return;
+                                }
+                            }
+                        }
+                    });
+                    contextMenuObserver.observe(document.body, { childList: true });
+                }
+
+                // Hover menu: apply hiding CSS class to grid-cell wrapper
+                let hoverMenuTarget;
+                if (hideHoverMenu) {
+                    hoverMenuTarget = qlikWrapper;
+                    hoverMenuTarget.classList.add('qshb-no-hover-menu');
+                }
+
+                return () => {
+                    if (contextMenuHandler) {
+                        qlikWrapper.removeEventListener('contextmenu', contextMenuHandler, true);
+                        clearTimeout(rightClickTimer);
+                    }
+                    if (contextMenuObserver) {
+                        contextMenuObserver.disconnect();
+                    }
+                    if (hoverMenuTarget) {
+                        hoverMenuTarget.classList.remove('qshb-no-hover-menu');
+                    }
+                };
             }, [platform, adapter, layout, isEditMode]);
 
             // NOTE: We intentionally do NOT destroy the toolbar button
@@ -129,41 +236,107 @@ export default function supernova(galaxy) {
 
 /**
  * Render the edit-mode placeholder inside the extension's grid cell.
+ * Layout matches onboard.qs: icon, title, stats, About button.
  *
  * @param {HTMLElement} element - The extension's container element.
  * @param {object} layout - Extension layout.
  */
 function renderEditPlaceholder(element, layout) {
     const menuCount = (layout.menuItems || []).length;
-    const hasBugReport = layout.bugReport?.enabled ? 'Yes' : 'No';
-    const title = resolveText(layout.buttonLabel, 'editPlaceholderTitle');
-    const description = resolveText('', 'editPlaceholderDescription');
+    const hasBugReport = layout.bugReport?.enabled;
+
+    const statsText =
+        `${menuCount} menu item${menuCount !== 1 ? 's' : ''}` +
+        (hasBugReport ? ' · Bug report: On' : '');
 
     element.innerHTML = `
-        <div class="qshb-edit-placeholder">
-            <div class="qshb-edit-placeholder-icon">
-                ${makeSvg('help', 32, '#165a9b')}
-            </div>
-            <div class="qshb-edit-placeholder-title">${title}</div>
-            <div class="qshb-edit-placeholder-description">${description}</div>
-            <div class="qshb-edit-placeholder-badge">
-                <span class="qshb-edit-placeholder-stat">${menuCount} menu items</span>
-                <span class="qshb-edit-placeholder-stat">Bug report: ${hasBugReport}</span>
+        <div class="qshb-edit-placeholder"
+             title="qs-help-button — ${statsText}">
+            <div class="qshb-edit-placeholder-info">
+                <div class="qshb-edit-placeholder-icon">
+                    ${makeSvg('help', 32, '#165a9b')}
+                </div>
+                <div class="qshb-edit-placeholder-title">Help Button</div>
+                <div class="qshb-edit-placeholder-stats">${statsText}</div>
+                <div class="qshb-edit-placeholder-actions">
+                    <button class="qshb-btn qshb-btn--ghost qshb-about-btn"
+                            title="About qs-help-button">
+                        &#9432; About
+                    </button>
+                </div>
             </div>
         </div>
     `;
 }
 
 /**
- * Render the analysis-mode placeholder (minimal / invisible).
- * The actual button is injected into the toolbar, not into the grid cell.
+ * Render the analysis-mode placeholder.
+ * Text is customizable and optionally hidden via layout properties.
  *
  * @param {HTMLElement} element - The extension's container element.
+ * @param {object} layout - Extension layout.
  */
-function renderAnalysisPlaceholder(element) {
-    element.innerHTML = `
-        <div class="qshb-analysis-placeholder">
-            Help button active in toolbar
+function renderAnalysisPlaceholder(element, layout) {
+    const show = layout.widget?.showAnalysisPlaceholder !== false;
+    const text = layout.widget?.analysisPlaceholderText || resolveText('', 'analysisPlaceholder');
+
+    element.innerHTML = show
+        ? `<div class="qshb-analysis-placeholder">${escapeHtml(text)}</div>`
+        : `<div class="qshb-analysis-placeholder qshb-analysis-placeholder--hidden"></div>`;
+}
+
+/**
+ * Open a modal "About" dialog with extension info, version, and links.
+ */
+function openAboutModal() {
+    // Remove any existing about modal
+    const existing = document.querySelector('.qshb-about-overlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'qshb-about-overlay';
+    overlay.innerHTML = `
+        <div class="qshb-about-modal">
+            <div class="qshb-about-modal__header">
+                <span class="qshb-about-modal__icon">${makeSvg('help', 28, '#165a9b')}</span>
+                <span class="qshb-about-modal__title">qs-help-button</span>
+                <span class="qshb-about-modal__version">v${escapeHtml(PACKAGE_VERSION)}</span>
+            </div>
+            <p class="qshb-about-modal__tagline">
+                Configurable help button for Qlik Sense apps.
+            </p>
+            <div class="qshb-about-modal__links">
+                <a href="https://github.com/ptarmiganlabs/qs-help-button" target="_blank" rel="noopener noreferrer">
+                    <strong>Documentation &amp; Source Code</strong>
+                    <span>README, docs, and full source on GitHub.</span>
+                </a>
+                <a href="https://github.com/ptarmiganlabs/qs-help-button/issues/new/choose" target="_blank" rel="noopener noreferrer">
+                    <strong>Report a Bug / Request a Feature</strong>
+                    <span>Open an issue on GitHub to report problems or suggest improvements.</span>
+                </a>
+                <a href="https://ptarmiganlabs.com" target="_blank" rel="noopener noreferrer">
+                    <strong>Ptarmigan Labs</strong>
+                    <span>Qlik Sense tools, blog posts, extensions &amp; consulting.</span>
+                </a>
+            </div>
+            <div class="qshb-about-modal__footer">
+                <button class="qshb-btn qshb-btn--secondary qshb-about-close-btn">Close</button>
+            </div>
         </div>
     `;
+
+    document.body.appendChild(overlay);
+
+    const close = () => {
+        document.removeEventListener('keydown', onKey);
+        overlay.remove();
+    };
+    const onKey = (e) => {
+        if (e.key === 'Escape') close();
+    };
+    document.addEventListener('keydown', onKey);
+    overlay.querySelector('.qshb-about-close-btn').addEventListener('click', close);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) close();
+    });
 }

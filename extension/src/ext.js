@@ -22,7 +22,72 @@ export default function ext(_galaxy) {
                     items: {
                         headerText: {
                             component: 'text',
-                            label: `qs-help-button v${PACKAGE_VERSION}\nby Ptarmigan Labs`,
+                            label: `qs-help-button v${PACKAGE_VERSION}\nConfigurable help button for Qlik Sense.`,
+                        },
+                        linkGithub: {
+                            component: 'link',
+                            label: 'GitHub — docs & source',
+                            url: 'https://github.com/ptarmiganlabs/qs-help-button',
+                        },
+                        linkIssues: {
+                            component: 'link',
+                            label: 'Report a bug / request a feature',
+                            url: 'https://github.com/ptarmiganlabs/qs-help-button/issues/new/choose',
+                        },
+                        linkPtarmigan: {
+                            component: 'link',
+                            label: 'Ptarmigan Labs',
+                            url: 'https://ptarmiganlabs.com',
+                        },
+                    },
+                },
+
+                // ---------------------------------------------------------------
+                // Widget (grid cell) appearance
+                // ---------------------------------------------------------------
+                widgetSection: {
+                    type: 'items',
+                    label: 'Widget Appearance',
+                    items: {
+                        hideHoverMenu: {
+                            ref: 'widget.hideHoverMenu',
+                            label: 'Hide hover menu',
+                            type: 'boolean',
+                            defaultValue: false,
+                            component: 'switch',
+                            options: [
+                                { value: true, label: 'Hidden' },
+                                { value: false, label: 'Visible' },
+                            ],
+                        },
+                        hideContextMenu: {
+                            ref: 'widget.hideContextMenu',
+                            label: 'Hide context menu',
+                            type: 'boolean',
+                            defaultValue: false,
+                            component: 'switch',
+                            options: [
+                                { value: true, label: 'Hidden' },
+                                { value: false, label: 'Visible' },
+                            ],
+                        },
+                        showAnalysisPlaceholder: {
+                            ref: 'widget.showAnalysisPlaceholder',
+                            label: 'Show placeholder text in analysis mode',
+                            type: 'boolean',
+                            defaultValue: true,
+                            component: 'switch',
+                            options: [
+                                { value: true, label: 'Show' },
+                                { value: false, label: 'Hide' },
+                            ],
+                        },
+                        analysisPlaceholderText: {
+                            ref: 'widget.analysisPlaceholderText',
+                            label: 'Analysis placeholder text (empty = auto)',
+                            type: 'string',
+                            defaultValue: '',
+                            show: (layout) => layout.widget?.showAnalysisPlaceholder !== false,
                         },
                     },
                 },

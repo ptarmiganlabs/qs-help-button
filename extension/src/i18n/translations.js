@@ -165,6 +165,19 @@ const translations = {
         pl: 'Dodaje przycisk pomocy na pasku narzędzi. Skonfiguruj elementy menu w panelu właściwości.',
         es: 'Inyecta un botón de ayuda en la barra de herramientas. Configura los elementos del menú en el panel de propiedades.',
     },
+
+    // Analysis mode placeholder
+    analysisPlaceholder: {
+        en: 'Help button active in toolbar',
+        sv: 'Hjälpknapp aktiv i verktygsfältet',
+        no: 'Hjelpeknapp aktiv i verktøylinjen',
+        da: 'Hjælpeknap aktiv i værktøjslinjen',
+        fi: 'Ohjepainike aktiivinen työkalupalkissa',
+        de: 'Hilfe-Schaltfläche aktiv in der Symbolleiste',
+        fr: "Bouton d'aide actif dans la barre d'outils",
+        pl: 'Przycisk pomocy aktywny na pasku narzędzi',
+        es: 'Botón de ayuda activo en la barra de herramientas',
+    },
 };
 
 export default translations;

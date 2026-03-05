@@ -396,6 +396,7 @@
 
 /* -------------------------------------------------------------------------
  * Edit-mode placeholder (rendered inside the extension's grid cell)
+ * Matches onboard.qs layout: icon, title, stats, About button.
  * ------------------------------------------------------------------------- */
 .qshb-edit-placeholder {
     display: flex;
@@ -403,13 +404,20 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    padding: 16px;
     box-sizing: border-box;
     border: 2px dashed #165a9b;
-    border-radius: 8px;
-    background: #f0f6fc;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #f0f6fc, #e4eef8);
+    overflow: hidden;
+}
+
+.qshb-edit-placeholder-info {
     text-align: center;
-    gap: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
 }
 
 .qshb-edit-placeholder-icon {
@@ -424,28 +432,62 @@
     margin: 0;
 }
 
-.qshb-edit-placeholder-description {
-    font-size: 12px;
-    color: #555;
-    margin: 0;
-    max-width: 300px;
-    line-height: 1.4;
-}
-
-.qshb-edit-placeholder-badge {
-    display: inline-flex;
-    gap: 12px;
-    margin-top: 4px;
-}
-
-.qshb-edit-placeholder-stat {
+.qshb-edit-placeholder-stats {
     font-size: 11px;
-    color: #888;
-    font-weight: 600;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.qshb-edit-placeholder-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* --- Edit mode: responsive size tiers (xs / sm / md via data-size) --- */
+
+/* sm tier (80-159px) */
+.qshb-edit-placeholder[data-size='sm'] .qshb-edit-placeholder-stats {
+    display: none;
+}
+.qshb-edit-placeholder[data-size='sm'] .qshb-edit-placeholder-info {
+    padding: 6px;
+}
+
+/* xs tier (< 80px) */
+.qshb-edit-placeholder[data-size='xs'] .qshb-edit-placeholder-icon {
+    display: none;
+}
+.qshb-edit-placeholder[data-size='xs'] .qshb-edit-placeholder-stats {
+    display: none;
+}
+.qshb-edit-placeholder[data-size='xs'] .qshb-edit-placeholder-info {
+    flex-direction: row;
+    gap: 6px;
+    padding: 4px 8px;
+    text-align: left;
+}
+.qshb-edit-placeholder[data-size='xs'] .qshb-edit-placeholder-title {
+    font-size: 12px;
+    white-space: nowrap;
+}
+.qshb-edit-placeholder[data-size='xs'] .qshb-btn {
+    padding: 3px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* xs + narrow: stack vertically again */
+.qshb-edit-placeholder[data-size='xs'][data-narrow='true'] .qshb-edit-placeholder-info {
+    flex-direction: column;
+    text-align: center;
 }
 
 /* -------------------------------------------------------------------------
- * Analysis-mode placeholder (invisible — the button is in the toolbar)
+ * Analysis-mode placeholder
  * ------------------------------------------------------------------------- */
 .qshb-analysis-placeholder {
     display: flex;
@@ -455,4 +497,171 @@
     font-size: 11px;
     color: #aaa;
     font-style: italic;
+}
+
+.qshb-analysis-placeholder--hidden {
+    visibility: hidden;
+}
+
+/* -------------------------------------------------------------------------
+ * Shared button styles (ghost / secondary variants)
+ * ------------------------------------------------------------------------- */
+.qshb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        box-shadow 0.15s ease;
+    font-family: inherit;
+    line-height: 1.4;
+}
+
+.qshb-btn--ghost {
+    background: transparent;
+    color: #666;
+    border: 1px solid #ccc;
+    font-size: 12px;
+    padding: 5px 10px;
+}
+.qshb-btn--ghost:hover {
+    background: #f0f0f0;
+    color: #333;
+    border-color: #999;
+}
+
+.qshb-btn--secondary {
+    background: #e8e8e8;
+    color: #333;
+}
+.qshb-btn--secondary:hover {
+    background: #d0d0d0;
+}
+
+.qshb-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* -------------------------------------------------------------------------
+ * About modal overlay
+ * ------------------------------------------------------------------------- */
+.qshb-about-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Source Sans Pro', 'Segoe UI', sans-serif;
+}
+
+.qshb-about-modal {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    width: 380px;
+    max-width: 92vw;
+    padding: 28px 28px 20px;
+    animation: qshb-about-fade-in 0.15s ease;
+}
+
+@keyframes qshb-about-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.qshb-about-modal__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.qshb-about-modal__icon {
+    line-height: 0;
+}
+
+.qshb-about-modal__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+}
+
+.qshb-about-modal__version {
+    font-size: 12px;
+    color: #888;
+    margin-left: auto;
+}
+
+.qshb-about-modal__tagline {
+    font-size: 13px;
+    color: #555;
+    margin: 4px 0 16px;
+    line-height: 1.4;
+}
+
+.qshb-about-modal__links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.qshb-about-modal__links a {
+    display: block;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition:
+        border-color 0.15s,
+        background 0.15s;
+}
+
+.qshb-about-modal__links a:hover {
+    border-color: #165a9b;
+    background: #f0f6fc;
+}
+
+.qshb-about-modal__links a strong {
+    display: block;
+    font-size: 13px;
+    color: #165a9b;
+    margin-bottom: 2px;
+}
+
+.qshb-about-modal__links a span {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.qshb-about-modal__footer {
+    text-align: right;
+}
+
+/* -------------------------------------------------------------------------
+ * Hover menu override — hides Qlik's hover nav when enabled
+ * ------------------------------------------------------------------------- */
+.qshb-no-hover-menu .qv-object-nav,
+.qshb-no-hover-menu .qv-object-actions-toolbar,
+.qshb-no-hover-menu .on-demand-holder,
+.qshb-no-hover-menu [class*='ActionsToolbar'] {
+    display: none !important;
 }
