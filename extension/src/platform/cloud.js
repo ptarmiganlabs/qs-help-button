@@ -18,25 +18,16 @@ import { getSelectors } from './selectors';
  * Get the toolbar anchor element where the help button should be injected.
  *
  * Cloud toolbar structure uses data-testid attributes. The help button
- * is injected into the top bar.
+ * is injected as the first child of the right-side actions area
+ * (`[data-testid="top-bar-right-side"]`), placing it next to the
+ * search / notifications / profile buttons.
  *
  * @param {string} [codePath] - Code-path name.
  * @returns {Element | null} The toolbar anchor element, or null if not found.
  */
 export function getToolbarAnchor(codePath) {
     const sels = getSelectors('cloud', codePath);
-    const toolbar = document.querySelector(sels.toolbarAnchor);
-
-    if (!toolbar) return null;
-
-    // In Cloud, the toolbar is a flex container. We look for the right-side
-    // actions area to inject our button. If not found, use the toolbar itself.
-    const rightSection =
-        toolbar.querySelector('[data-testid="top-bar-actions"]') ||
-        toolbar.querySelector('[class*="right"]') ||
-        toolbar.lastElementChild;
-
-    return rightSection || toolbar;
+    return document.querySelector(sels.toolbarAnchor);
 }
 
 /**

@@ -34,10 +34,10 @@ const selectors = {
          * Cloud toolbar uses data-testid attributes on MUI components.
          */
         default: {
-            /** Primary toolbar anchor — help button is injected here. */
-            toolbarAnchor: '[data-testid="top-bar-root"]',
+            /** Primary toolbar anchor — help button is injected as first child. */
+            toolbarAnchor: '[data-testid="top-bar-right-side"]',
 
-            /** Alternative: the toolbar's right section. */
+            /** Top-level toolbar root (for general detection). */
             toolbar: '[data-testid="top-bar-root"]',
 
             /** Sub-toolbar (selections bar). */
