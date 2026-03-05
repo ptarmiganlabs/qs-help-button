@@ -9,6 +9,7 @@
 
 import { PACKAGE_VERSION } from './util/logger';
 import { toPickerObj } from './util/color';
+import translations from './i18n/translations';
 
 export default function ext(_galaxy) {
     return {
@@ -45,6 +46,57 @@ export default function ext(_galaxy) {
                                 { value: 'pl', label: 'Polski' },
                                 { value: 'es', label: 'Español' },
                             ],
+                            change: function (data) {
+                                if (!data._lastLanguage) {
+                                    data._lastLanguage = 'auto';
+                                }
+
+                                const isAuto = data.language === 'auto';
+                                const msg = isAuto
+                                    ? 'Setting language to Auto-detect will clear all your translated fields to allow automatic translation. Continue?'
+                                    : `Setting language to a specific locale will overwrite all your translation fields with the standard ${data.language.toUpperCase()} texts. Continue?`;
+
+                                if (window.confirm(msg)) {
+                                    data._lastLanguage = data.language;
+
+                                    if (isAuto) {
+                                        data.buttonLabel = '';
+                                        data.buttonTooltip = '';
+                                        data.popupTitle = '';
+                                        if (data.widget) {
+                                            data.widget.analysisPlaceholderText = '';
+                                        }
+                                        if (data.menuItems && Array.isArray(data.menuItems)) {
+                                            data.menuItems.forEach((item) => {
+                                                if (item.action === 'bugReport' && item.bugReport && item.bugReport.dialogStrings) {
+                                                    item.bugReport.dialogStrings.title = '';
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        const lang = data.language;
+                                        data.buttonLabel = translations.buttonLabel[lang] || '';
+                                        data.buttonTooltip = translations.buttonTooltip[lang] || '';
+                                        data.popupTitle = translations.popupTitle[lang] || '';
+                                        
+                                        if (!data.widget) data.widget = {};
+                                        data.widget.analysisPlaceholderText = translations.analysisPlaceholder[lang] || '';
+
+                                        if (data.menuItems && Array.isArray(data.menuItems)) {
+                                            data.menuItems.forEach((item) => {
+                                                if (item.action === 'bugReport') {
+                                                    if (!item.bugReport) item.bugReport = {};
+                                                    if (!item.bugReport.dialogStrings) item.bugReport.dialogStrings = {};
+                                                    item.bugReport.dialogStrings.title = translations.bugReportTitle[lang] || '';
+                                                }
+                                            });
+                                        }
+                                    }
+                                } else {
+                                    // Revert the dropdown
+                                    data.language = data._lastLanguage;
+                                }
+                            }
                         },
                     },
                 },
