@@ -8,7 +8,7 @@ on Windows and Qlik Cloud.
 
 Installation
 ------------
-1. Import the inner helpbutton-qs-ext.zip file via:
+1. Import the inner helpbutton-qs.zip file via:
    - Client-managed: QMC → Extensions → Import
    - Qlik Cloud: Management Console → Extensions → Add
 

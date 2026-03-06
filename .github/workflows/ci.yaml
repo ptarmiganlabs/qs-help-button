@@ -66,8 +66,10 @@ jobs:
 
       - name: Create basic variant zip
         run: |
+          VERSION=${{ needs.release-please.outputs.release_version }}
+          sed "s/__VERSION__/${VERSION}/g" release-config/html-variant-readme-template.txt > readme.txt
           cd variants/basic
-          zip -r "../../${DIST_FILE_NAME}-basic-v${{ needs.release-please.outputs.release_version }}.zip" \
+          zip -r "../../${DIST_FILE_NAME}-basic-v${VERSION}.zip" \
             README.md \
             da \
             de \
@@ -78,12 +80,15 @@ jobs:
             no \
             pl \
             sv \
-            -x "*/demo-server/*" "*/node_modules/*"
+            -x "*/node_modules/*"
+          cd ../..
+          zip -j "${DIST_FILE_NAME}-basic-v${VERSION}.zip" LICENSE readme.txt
 
       - name: Create bug-report variant zip
         run: |
+          VERSION=${{ needs.release-please.outputs.release_version }}
           cd variants/bug-report
-          zip -r "../../${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip" \
+          zip -r "../../${DIST_FILE_NAME}-bug-report-v${VERSION}.zip" \
             README.md \
             da \
             de \
@@ -94,7 +99,9 @@ jobs:
             no \
             pl \
             sv \
-            -x "demo-server/node_modules/*" "*/demo-server/node_modules/*"
+            -x "*/node_modules/*"
+          cd ../..
+          zip -j "${DIST_FILE_NAME}-bug-report-v${VERSION}.zip" LICENSE readme.txt
 
       - name: List zip contents (debug)
         run: |
@@ -112,7 +119,7 @@ jobs:
       - name: Build extension
         run: |
           cd extension
-          npm ci
+          PUPPETEER_SKIP_DOWNLOAD=true npm ci
           npm run pack:prod
 
       - name: Create extension release zip
@@ -120,17 +127,17 @@ jobs:
           VERSION=${{ needs.release-please.outputs.release_version }}
 
           # Create readme.txt from template
-          sed "s/__VERSION__/${VERSION}/g" extension/release-config/readme-template.txt > extension-readme.txt
+          sed "s/__VERSION__/${VERSION}/g" release-config/extension-readme-template.txt > readme.txt
 
           # Create outer zip containing the extension zip + readme + license
-          zip "${DIST_FILE_NAME}-ext-v${VERSION}.zip" \
+          zip -j "${DIST_FILE_NAME}-extension-v${VERSION}.zip" \
             extension/helpbutton-qs.zip \
-            extension-readme.txt \
+            readme.txt \
             LICENSE
 
           echo ""
           echo "=== Extension variant ==="
-          zipinfo "${DIST_FILE_NAME}-ext-v${VERSION}.zip"
+          zipinfo "${DIST_FILE_NAME}-extension-v${VERSION}.zip"
 
       - name: Upload release artifacts
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
@@ -144,4 +151,4 @@ jobs:
           artifacts: |
             ${{ env.DIST_FILE_NAME }}-basic-v${{ needs.release-please.outputs.release_version }}.zip
             ${{ env.DIST_FILE_NAME }}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip
-            ${{ env.DIST_FILE_NAME }}-ext-v${{ needs.release-please.outputs.release_version }}.zip
+            ${{ env.DIST_FILE_NAME }}-extension-v${{ needs.release-please.outputs.release_version }}.zip
