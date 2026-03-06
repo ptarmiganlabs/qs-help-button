@@ -44,7 +44,6 @@ export default {
     // -- Popup appearance --
     popupTitle: '',
     popupStyle: {
-        backgroundColor: toPickerObj('#ffffff'),
         borderColor: toPickerObj('#0c3256'),
         borderRadius: '8px',
         headerBackgroundColor: toPickerObj('#0c3256'),
