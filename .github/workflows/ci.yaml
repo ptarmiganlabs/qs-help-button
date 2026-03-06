@@ -116,7 +116,7 @@ jobs:
       - name: Build extension
         run: |
           cd extension
-          npm ci
+          PUPPETEER_SKIP_DOWNLOAD=true npm ci
           npm run pack:prod
 
       - name: Create extension release zip
