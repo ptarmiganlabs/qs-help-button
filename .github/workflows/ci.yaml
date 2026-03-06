@@ -66,8 +66,10 @@ jobs:
 
       - name: Create basic variant zip
         run: |
+          VERSION=${{ needs.release-please.outputs.release_version }}
+          sed "s/__VERSION__/${VERSION}/g" release-config/html-variant-readme-template.txt > readme.txt
           cd variants/basic
-          zip -r "../../${DIST_FILE_NAME}-basic-v${{ needs.release-please.outputs.release_version }}.zip" \
+          zip -r "../../${DIST_FILE_NAME}-basic-v${VERSION}.zip" \
             README.md \
             da \
             de \
@@ -80,12 +82,13 @@ jobs:
             sv \
             -x "*/node_modules/*"
           cd ../..
-          zip -j "${DIST_FILE_NAME}-basic-v${{ needs.release-please.outputs.release_version }}.zip" LICENSE
+          zip -j "${DIST_FILE_NAME}-basic-v${VERSION}.zip" LICENSE readme.txt
 
       - name: Create bug-report variant zip
         run: |
+          VERSION=${{ needs.release-please.outputs.release_version }}
           cd variants/bug-report
-          zip -r "../../${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip" \
+          zip -r "../../${DIST_FILE_NAME}-bug-report-v${VERSION}.zip" \
             README.md \
             da \
             de \
@@ -98,7 +101,7 @@ jobs:
             sv \
             -x "*/node_modules/*"
           cd ../..
-          zip -j "${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip" LICENSE
+          zip -j "${DIST_FILE_NAME}-bug-report-v${VERSION}.zip" LICENSE readme.txt
 
       - name: List zip contents (debug)
         run: |
@@ -124,7 +127,7 @@ jobs:
           VERSION=${{ needs.release-please.outputs.release_version }}
 
           # Create readme.txt from template
-          sed "s/__VERSION__/${VERSION}/g" extension/release-config/readme-template.txt > readme.txt
+          sed "s/__VERSION__/${VERSION}/g" release-config/extension-readme-template.txt > readme.txt
 
           # Create outer zip containing the extension zip + readme + license
           zip -j "${DIST_FILE_NAME}-extension-v${VERSION}.zip" \
