@@ -68,15 +68,35 @@ The following fields are available:
 | Field Name | Description | Example |
 |---|---|---|
 | `userName` | Full name of the authenticated user | `John Doe` |
-| `userId` | User ID of the authenticated user | `johnd` |
-| `userDirectory` | Directory of the authenticated user | `CORP` |
+| `userId` | User ID of the authenticated user | `johnd` (CM) / `johnd@example.com` (Cloud) |
+| `userDirectory` | Directory of the authenticated user (client-managed only) | `CORP` |
 | `appId` | GUID of the active Qlik Sense application | `df68e14d-...` |
 | `sheetId` | ID of the active sheet | `850cffb0-...` |
 | `urlPath` | Current URL path context of the browser | `/sense/app/.../sheet/...` |
-| `senseVersion` | Qlik Sense product version (Client-managed) or region (SaaS) | `November 2023` |
-| `platform` | Auto-detected platform type | `client-managed` or `saas` |
-| `browser` | Basic browser user-agent detail | `User-Agent: Mozilla/5.0...` |
+| `senseVersion` | Qlik Sense product version (client-managed only) | `November 2023 (v14.187.4)` |
+| `platform` | Auto-detected platform type | `client-managed` or `cloud` |
+| `browser` | Browser user-agent string | `Mozilla/5.0...` |
 | `timestamp` | Local time the report dialog was opened | `3/6/2026, 8:51:57 AM` |
+
+### Cloud vs Client-Managed Availability
+
+Not all context fields are available on every platform. The table below summarises what each field returns on **Qlik Cloud** and **Client-Managed** (Enterprise on Windows) deployments.
+
+| Field | Client-Managed | Qlik Cloud |
+|---|---|---|
+| `userName` | ✅ User's full name from the Qlik Sense proxy API | ✅ User's display name from the Cloud `/api/v1/users/me` API |
+| `userId` | ✅ Windows login name (e.g. `jsmith`) | ✅ User's email address (e.g. `jsmith@example.com`) |
+| `userDirectory` | ✅ Active Directory / user directory (e.g. `CORP`) | ❌ Not applicable — shown as `(N/A)` |
+| `senseVersion` | ✅ Product version from `product-info.js` | ❌ Not available — shown as `(unavailable)` |
+| `appId` | ✅ Parsed from URL | ✅ Parsed from URL |
+| `sheetId` | ✅ Parsed from URL | ✅ Parsed from URL |
+| `urlPath` | ✅ Current browser URL path | ✅ Current browser URL path |
+| `platform` | ✅ `client-managed` | ✅ `cloud` |
+| `browser` | ✅ `navigator.userAgent` | ✅ `navigator.userAgent` |
+| `timestamp` | ✅ Local date/time | ✅ Local date/time |
+
+> **Tip:** For Qlik Cloud deployments you may want to remove `userDirectory` and `senseVersion` from the `collectFields` setting since they are not applicable. A recommended Cloud configuration would be:
+> `userId,userName,appId,sheetId,urlPath,platform,browser,timestamp`
 
 By default, the property panel has this pre-populated setting:
 `userDirectory,userId,senseVersion,appId,sheetId,urlPath`

@@ -366,12 +366,42 @@ function showDialogToast(toastArea, message, type) {
 // ---------------------------------------------------------------------------
 
 /**
- * Fetch current user info from the Qlik Sense proxy API (client-managed only).
- * GET /qps/user?targetUri=<current URL>
+ * Fetch current user info.
  *
+ * On **client-managed** Qlik Sense the proxy API is used:
+ *   GET /qps/user?targetUri=<current URL>
+ *
+ * On **Qlik Cloud** the REST API is used:
+ *   GET /api/v1/users/me
+ *   — `email` is mapped to `userId`, `name` to `userName`.
+ *   — `userDirectory` is not applicable and returns '(N/A)'.
+ *
+ * @param {'client-managed' | 'cloud'} platformType - Current platform.
  * @returns {Promise<{userId: string, userDirectory: string, userName: string}>}
  */
-function getUserInfo() {
+function getUserInfo(platformType) {
+    if (platformType === 'cloud') {
+        return fetch('/api/v1/users/me')
+            .then((resp) => {
+                if (!resp.ok) throw new Error('Cloud user info request failed: ' + resp.status);
+                return resp.json();
+            })
+            .then((data) => ({
+                userId: data.email || '(unknown)',
+                userDirectory: '(N/A)',
+                userName: data.name || '(unknown)',
+            }))
+            .catch((err) => {
+                logger.warn('Failed to fetch Cloud user info:', err);
+                return {
+                    userId: '(unavailable)',
+                    userDirectory: '(N/A)',
+                    userName: '(unavailable)',
+                };
+            });
+    }
+
+    // Client-managed: use the proxy API
     return fetch('/qps/user?targetUri=' + encodeURIComponent(window.location.href))
         .then((resp) => {
             if (!resp.ok) throw new Error('User info request failed: ' + resp.status);
@@ -439,7 +469,7 @@ function gatherContextData(fields, platformType) {
         fields.includes('userDirectory');
     const needVersion = fields.includes('senseVersion');
 
-    const userPromise = needUser ? getUserInfo() : Promise.resolve({});
+    const userPromise = needUser ? getUserInfo(platformType) : Promise.resolve({});
     const versionPromise = needVersion ? getSenseVersion() : Promise.resolve('');
 
     return Promise.all([userPromise, versionPromise]).then(([user, version]) => {
