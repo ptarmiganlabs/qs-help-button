@@ -68,7 +68,7 @@ The following fields are available:
 | Field Name | Description | Example |
 |---|---|---|
 | `userName` | Full name of the authenticated user | `John Doe` |
-| `userId` | User ID of the authenticated user | `johnd` (CM) / `johnd@example.com` (Cloud) |
+| `userId` | User ID of the authenticated user | `johnd` (client-managed) / `johnd@example.com` (Cloud) |
 | `userDirectory` | Directory of the authenticated user (client-managed only) | `CORP` |
 | `appId` | GUID of the active Qlik Sense application | `df68e14d-...` |
 | `sheetId` | ID of the active sheet | `850cffb0-...` |

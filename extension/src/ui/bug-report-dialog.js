@@ -394,9 +394,9 @@ function getUserInfo(platformType) {
             .catch((err) => {
                 logger.warn('Failed to fetch Cloud user info:', err);
                 return {
-                    userId: '(unavailable)',
+                    userId: '(unknown)',
                     userDirectory: '(N/A)',
-                    userName: '(unavailable)',
+                    userName: '(unknown)',
                 };
             });
     }
