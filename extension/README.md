@@ -70,6 +70,11 @@ The following fields are available:
 | `userName` | Full name of the authenticated user | `John Doe` |
 | `userId` | User ID of the authenticated user | `johnd` (client-managed) / `johnd@example.com` (Cloud) |
 | `userDirectory` | Directory of the authenticated user (client-managed only) | `CORP` |
+| `tenantId` | Tenant ID of the user (Qlik Cloud only) | `tenantxyz` |
+| `status` | Account status (Qlik Cloud only) | `active` |
+| `picture` | URL to the user's avatar (Qlik Cloud only) | `https://s.gravatar.com/...` |
+| `preferredZoneinfo` | User's preferred time zone (Qlik Cloud only) | `Europe/Stockholm` |
+| `roles` | Comma-separated list of user roles (Qlik Cloud only) | `[AnalyticsAdmin], [SharedSpaceCreator]` |
 | `appId` | GUID of the active Qlik Sense application | `df68e14d-...` |
 | `sheetId` | ID of the active sheet | `850cffb0-...` |
 | `urlPath` | Current URL path context of the browser | `/sense/app/.../sheet/...` |
@@ -87,7 +92,12 @@ Not all context fields are available on every platform. The table below summaris
 | `userName` | ✅ User's full name from the Qlik Sense proxy API | ✅ User's display name from the Cloud `/api/v1/users/me` API |
 | `userId` | ✅ Windows login name (e.g. `jsmith`) | ✅ User's email address (e.g. `jsmith@example.com`) |
 | `userDirectory` | ✅ Active Directory / user directory (e.g. `CORP`) | ❌ Not applicable — shown as `(N/A)` |
-| `senseVersion` | ✅ Product version from `product-info.js` | ❌ Not available — shown as `(unavailable)` |
+| `tenantId` | ❌ Not applicable — shown as `(N/A)` | ✅ Included in the Cloud `/api/v1/users/me` API |
+| `status` | ❌ Not applicable — shown as `(N/A)` | ✅ Included in the Cloud `/api/v1/users/me` API |
+| `picture` | ❌ Not applicable — shown as `(N/A)` | ✅ Included in the Cloud `/api/v1/users/me` API |
+| `preferredZoneinfo` | ❌ Not applicable — shown as `(N/A)` | ✅ Included in the Cloud `/api/v1/users/me` API |
+| `roles` | ❌ Not applicable — shown as `(N/A)` | ✅ Included in the Cloud `/api/v1/users/me` API |
+| `senseVersion` | ✅ Product version from `product-info.js` | ❌ Not available — shown as `(N/A)` |
 | `appId` | ✅ Parsed from URL | ✅ Parsed from URL |
 | `sheetId` | ✅ Parsed from URL | ✅ Parsed from URL |
 | `urlPath` | ✅ Current browser URL path | ✅ Current browser URL path |

@@ -28,6 +28,11 @@ const DEFAULT_FIELD_LABELS = {
     platform: 'Platform',
     browser: 'Browser',
     timestamp: 'Timestamp',
+    tenantId: 'Tenant ID',
+    status: 'Status',
+    picture: 'Picture',
+    preferredZoneinfo: 'Preferred Zone Info',
+    roles: 'Roles',
 };
 
 // Fields that should render side-by-side in a paired row.
@@ -390,6 +395,13 @@ function getUserInfo(platformType) {
                 userId: data.email || '(unknown)',
                 userDirectory: '(N/A)',
                 userName: data.name || '(unknown)',
+                tenantId: data.tenantId || '(unknown)',
+                status: data.status || '(unknown)',
+                picture: data.picture || '(unknown)',
+                preferredZoneinfo: data.preferredZoneinfo || '(unknown)',
+                roles: Array.isArray(data.roles) && data.roles.length > 0
+                    ? data.roles.map((r) => '[' + r + ']').join(', ')
+                    : '(none)',
             }))
             .catch((err) => {
                 logger.warn('Failed to fetch Cloud user info:', err);
@@ -397,6 +409,11 @@ function getUserInfo(platformType) {
                     userId: '(unknown)',
                     userDirectory: '(N/A)',
                     userName: '(unknown)',
+                    tenantId: '(unknown)',
+                    status: '(unknown)',
+                    picture: '(unknown)',
+                    preferredZoneinfo: '(unknown)',
+                    roles: '(unknown)',
                 };
             });
     }
@@ -411,6 +428,11 @@ function getUserInfo(platformType) {
             userId: data.userId || '(unknown)',
             userDirectory: data.userDirectory || '(unknown)',
             userName: data.userName || '(unknown)',
+            tenantId: '(N/A)',
+            status: '(N/A)',
+            picture: '(N/A)',
+            preferredZoneinfo: '(N/A)',
+            roles: '(N/A)',
         }))
         .catch((err) => {
             logger.warn('Failed to fetch user info:', err);
@@ -418,6 +440,11 @@ function getUserInfo(platformType) {
                 userId: '(unavailable)',
                 userDirectory: '(unavailable)',
                 userName: '(unavailable)',
+                tenantId: '(N/A)',
+                status: '(N/A)',
+                picture: '(N/A)',
+                preferredZoneinfo: '(N/A)',
+                roles: '(N/A)',
             };
         });
 }
@@ -466,7 +493,12 @@ function gatherContextData(fields, platformType) {
     const needUser =
         fields.includes('userId') ||
         fields.includes('userName') ||
-        fields.includes('userDirectory');
+        fields.includes('userDirectory') ||
+        fields.includes('tenantId') ||
+        fields.includes('status') ||
+        fields.includes('picture') ||
+        fields.includes('preferredZoneinfo') ||
+        fields.includes('roles');
     const needVersion = fields.includes('senseVersion');
 
     const userPromise = needUser ? getUserInfo(platformType) : Promise.resolve({});
@@ -486,8 +518,23 @@ function gatherContextData(fields, platformType) {
                 case 'userDirectory':
                     context.userDirectory = user.userDirectory || '(unavailable)';
                     break;
+                case 'tenantId':
+                    context.tenantId = user.tenantId || '(unavailable)';
+                    break;
+                case 'status':
+                    context.status = user.status || '(unavailable)';
+                    break;
+                case 'picture':
+                    context.picture = user.picture || '(unavailable)';
+                    break;
+                case 'preferredZoneinfo':
+                    context.preferredZoneinfo = user.preferredZoneinfo || '(unavailable)';
+                    break;
+                case 'roles':
+                    context.roles = user.roles || '(unavailable)';
+                    break;
                 case 'senseVersion':
-                    context.senseVersion = version || '(unavailable)';
+                    context.senseVersion = platformType === 'cloud' ? '(N/A)' : (version || '(unavailable)');
                     break;
                 case 'appId':
                     context.appId = appMatch ? appMatch[1] : '(not in an app)';
