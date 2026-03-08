@@ -29,7 +29,7 @@ flowchart TD
     B -- Analysis Mode --> E[Hide/Show Minimal Grid Cell]
     E --> F[Inject Button to Global Toolbar]
     F --> G[User clicks Help Button]
-    G --> H[Open Links/Bug Report with App Context]
+    G --> H[Open Links/Bug Report/Feedback with App Context]
 ```
 
 ## Installation
@@ -47,7 +47,7 @@ flowchart TD
 
 ## Menu Item Types
 
-When configuring the **Menu Items** in the Property Panel, you can add multiple options that map to different actions. The help button supports two types of menu actions:
+When configuring the **Menu Items** in the Property Panel, you can add multiple options that map to different actions. The help button supports three types of menu actions:
 
 1. **Outbound Link (`link`)**: 
    - Opens a specified URL (can be configured to open in a new tab or the same window).
@@ -56,6 +56,20 @@ When configuring the **Menu Items** in the Property Panel, you can add multiple 
 2. **Bug Report Dialog (`bugReport`)**: 
    - Opens an interactive modal directly inside Qlik Sense where users can write a detailed text description of an issue.
    - Automatically bundles the user's environment metadata into a JSON payload and POSTs it to a configured webhook endpoint via a background request. 
+3. **Feedback Dialog (`feedback`)**:
+   - Opens a modal dialog where users can rate the current app (1–5 stars) and/or leave a free-text comment.
+   - Star rating and comment fields can each be independently enabled or disabled via the property panel.
+   - When the comment field is enabled, a configurable maximum character length is enforced, with a live remaining-characters counter shown in the dialog.
+   - Automatically gathers environment context (same fields as the bug report) and POSTs the feedback data as JSON to a configured webhook endpoint.
+
+```mermaid
+flowchart LR
+    subgraph Menu Actions
+        A[Open URL] --> B[External Link]
+        C[Bug Report] --> D[Modal Dialog → POST to Webhook]
+        E[Feedback] --> F[Modal Dialog → POST to Webhook]
+    end
+```
 
 ## Bug Report Context Fields
 
@@ -82,6 +96,46 @@ The following fields are available:
 | `platform` | Auto-detected platform type | `client-managed` or `cloud` |
 | `browser` | Browser user-agent string | `Mozilla/5.0...` |
 | `timestamp` | Local time the report dialog was opened | `3/6/2026, 8:51:57 AM` |
+
+## Feedback Context Fields
+
+The **Feedback** dialog uses the same context fields as the bug report dialog. You can configure which fields to collect via the **"Context fields (comma-separated)"** setting under the Feedback Settings section in the property panel.
+
+### Feedback Configuration
+
+The feedback dialog supports these property panel settings:
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| Webhook URL | string | *(empty)* | POST endpoint to receive feedback data |
+| Authentication | dropdown | `None` | Auth strategy (None / Authorization header / Sense session / Custom headers) |
+| Show star rating | toggle | On | Whether to display a 1–5 star rating selector |
+| Show free-text comment | toggle | On | Whether to display a comment textarea |
+| Max comment length | number | `500` | Maximum characters allowed in the comment (shown as a live counter) |
+| Context fields | string | `userName,appId,...` | Comma-separated list of context fields to collect |
+| Dialog title | string | *(auto-translated)* | Custom dialog title (leave empty for auto-translation) |
+
+### Feedback Payload
+
+When the user submits feedback, it is POSTed as JSON to the configured webhook URL:
+
+```json
+{
+  "timestamp": "2026-03-08T12:00:00.000Z",
+  "context": {
+    "userName": "John Doe",
+    "appId": "df68e14d-...",
+    "sheetId": "850cffb0-...",
+    "urlPath": "/sense/app/.../sheet/.../state/analysis",
+    "platform": "client-managed",
+    "timestamp": "3/8/2026, 12:00:00 PM"
+  },
+  "rating": 4,
+  "comment": "Great dashboards, very useful for daily reporting."
+}
+```
+
+> **Note:** The `rating` field is only included when the star rating is enabled. The `comment` field is only included when the free-text comment is enabled. At least one of the two must be enabled and filled in for the user to submit.
 
 ### Cloud vs Client-Managed Availability
 
