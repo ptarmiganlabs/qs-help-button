@@ -313,7 +313,10 @@ export function openFeedbackDialog(config, platformType) {
 
         // Enable/disable submit based on form state
         function updateSubmitState() {
-            const hasAnyInput = (enableRating && selectedRating > 0) || (enableComment && commentTextarea && commentTextarea.value.trim().length > 0);
+            const hasRating = enableRating && selectedRating > 0;
+            const hasComment = enableComment && commentTextarea &&
+                commentTextarea.value.trim().length > 0;
+            const hasAnyInput = hasRating || hasComment;
 
             // At least one input must be provided
             submitBtn.disabled = !hasAnyInput;
