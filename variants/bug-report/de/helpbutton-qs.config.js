@@ -15,6 +15,20 @@
  */
 window.helpButtonQsConfig = {
   // --------------------------------------------------------------------------
+  // Farbthema (optional)
+  // --------------------------------------------------------------------------
+  // Eine vordefinierte Farbpalette anwenden. Wählen Sie eine aus:
+  //   'default'        — Neutral, minimalistisches Grau
+  //   'leanGreen'      — Volles Qlik-Grün-Spektrum
+  //   'corporateBlue'  — Autoritatives Blau mit goldenen Akzenten
+  //   'corporateGold'  — Warmes Gold mit blauen Akzenten
+  //
+  // Wenn gesetzt, liefert das Thema Standardwerte für buttonStyle, popupStyle
+  // und menuItemDefaults und dialogStyle.
+  // Einzelne Eigenschaften unten überschreiben weiterhin das Thema.
+  // theme: 'corporateBlue',
+
+  // --------------------------------------------------------------------------
   // Symbolleisten-Schaltfläche — Text und Tooltip
   // --------------------------------------------------------------------------
 

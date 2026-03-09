@@ -14,6 +14,20 @@
  */
 window.helpButtonQsConfig = {
   // --------------------------------------------------------------------------
+  // Theme preset (optional)
+  // --------------------------------------------------------------------------
+  // Apply a predefined color palette.  Choose one of:
+  //   'default'        — Neutral, minimal grey
+  //   'leanGreen'      — Full-spectrum Qlik green
+  //   'corporateBlue'  — Authoritative blue with gold accents
+  //   'corporateGold'  — Warm gold with blue accents
+  //
+  // When set, the theme provides default values for buttonStyle, popupStyle,
+  // menuItemDefaults, and (bug-report variant) dialogStyle.
+  // Any individual property below still overrides the theme.
+  // theme: 'corporateBlue',
+
+  // --------------------------------------------------------------------------
   // Toolbar button — text & tooltip
   // --------------------------------------------------------------------------
 
