@@ -14,20 +14,6 @@
  */
 window.helpButtonQsConfig = {
   // --------------------------------------------------------------------------
-  // Temaforhåndsinnstilling (valgfritt)
-  // --------------------------------------------------------------------------
-  // Bruk en forhåndsdefinert fargepalett. Velg en av:
-  //   'default'        — Nøytral, minimalistisk grå
-  //   'leanGreen'      — Fullt spektrum Qlik-grønn
-  //   'corporateBlue'  — Autoritativ blå med gylne aksenter
-  //   'corporateGold'  — Varm gull med blå aksenter
-  //
-  // Når satt, gir temaet standardverdier for buttonStyle, popupStyle
-  // og menuItemDefaults og dialogStyle.
-  // Individuelle egenskaper nedenfor overstyrer fortsatt temaet.
-  // theme: 'corporateBlue',
-
-  // --------------------------------------------------------------------------
   // Verktøylinjeknapp — tekst og verktøytips
   // --------------------------------------------------------------------------
 

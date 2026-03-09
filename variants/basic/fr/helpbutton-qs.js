@@ -26,138 +26,9 @@
   'use strict';
 
   // ---------------------------------------------------------------------------
-  // Theme presets
-  // ---------------------------------------------------------------------------
-  // Each preset defines a complete color palette for the button, popup, and
-  // menu items.  The user selects a preset via the `theme` config property.
-  // Individual style properties can still be overridden — overrides take
-  // precedence over the preset.
-  //
-  // Available presets:
-  //   'default'        — Neutral, minimal grey palette
-  //   'leanGreen'      — Full-spectrum Qlik green
-  //   'corporateBlue'  — Authoritative blue with gold accents
-  //   'corporateGold'  — Warm gold with blue accents
-  // ---------------------------------------------------------------------------
-  var THEME_PRESETS = {
-    default: {
-      buttonStyle: {
-        backgroundColor: '#595959',
-        backgroundColorHover: '#404040',
-        backgroundColorActive: '#333333',
-        textColor: '#ffffff',
-        borderColor: '#595959',
-        borderRadius: '4px',
-        focusOutlineColor: 'rgba(89, 89, 89, 0.4)',
-      },
-      popupStyle: {
-        backgroundColor: '#ffffff',
-        borderColor: '#595959',
-        borderRadius: '8px',
-        headerBackgroundColor: '#595959',
-        headerTextColor: '#ffffff',
-        separatorColor: '#e0e0e0',
-        shadowColor: 'rgba(0, 0, 0, 0.2)',
-      },
-      menuItemDefaults: {
-        iconColor: '#595959',
-        bgColor: '#f5f5f5',
-        bgColorHover: '#e8e8e8',
-        textColor: '#333333',
-      },
-    },
-
-    leanGreen: {
-      buttonStyle: {
-        backgroundColor: '#009845',
-        backgroundColorHover: '#007a38',
-        backgroundColorActive: '#006130',
-        textColor: '#ffffff',
-        borderColor: '#009845',
-        borderRadius: '4px',
-        focusOutlineColor: 'rgba(0, 152, 69, 0.4)',
-      },
-      popupStyle: {
-        backgroundColor: '#ffffff',
-        borderColor: '#006b30',
-        borderRadius: '8px',
-        headerBackgroundColor: '#006b30',
-        headerTextColor: '#ffffff',
-        separatorColor: '#e0e0e0',
-        shadowColor: 'rgba(0, 107, 48, 0.25)',
-      },
-      menuItemDefaults: {
-        iconColor: '#009845',
-        bgColor: '#e8f5ee',
-        bgColorHover: '#c8ebd5',
-        textColor: '#004d25',
-      },
-    },
-
-    corporateBlue: {
-      buttonStyle: {
-        backgroundColor: '#165a9b',
-        backgroundColorHover: '#12487c',
-        backgroundColorActive: '#0e3b65',
-        textColor: '#ffffff',
-        borderColor: '#0e3b65',
-        borderRadius: '4px',
-        focusOutlineColor: 'rgba(255, 204, 51, 0.6)',
-      },
-      popupStyle: {
-        backgroundColor: '#ffffff',
-        borderColor: '#0c3256',
-        borderRadius: '8px',
-        headerBackgroundColor: '#0c3256',
-        headerTextColor: '#ffcc33',
-        separatorColor: '#e0e0e0',
-        shadowColor: 'rgba(12, 50, 86, 0.25)',
-      },
-      menuItemDefaults: {
-        iconColor: '#165a9b',
-        bgColor: '#f0f6fc',
-        bgColorHover: '#dbeafe',
-        textColor: '#0c3256',
-      },
-    },
-
-    corporateGold: {
-      buttonStyle: {
-        backgroundColor: '#ffcc33',
-        backgroundColorHover: '#ffe494',
-        backgroundColorActive: '#f0be00',
-        textColor: '#222222',
-        borderColor: '#222222',
-        borderRadius: '4px',
-        focusOutlineColor: 'rgba(255, 204, 51, 0.4)',
-      },
-      popupStyle: {
-        backgroundColor: '#ffffff',
-        borderColor: '#0c3256',
-        borderRadius: '8px',
-        headerBackgroundColor: '#0c3256',
-        headerTextColor: '#ffcc33',
-        separatorColor: '#e0e0e0',
-        shadowColor: 'rgba(12, 50, 86, 0.25)',
-      },
-      menuItemDefaults: {
-        iconColor: '#165a9b',
-        bgColor: '#fffae6',
-        bgColorHover: '#fff3c4',
-        textColor: '#222222',
-      },
-    },
-  };
-
-  // ---------------------------------------------------------------------------
   // Configuration (merged with window.helpButtonQsConfig if present)
   // ---------------------------------------------------------------------------
   var DEFAULT_CONFIG = {
-    // -- Theme (optional) --
-    // Set to a preset name to apply a predefined color palette.
-    // Individual style properties below still override the theme.
-    // theme: 'corporateBlue',
-
     // -- Button appearance --
     buttonLabel: 'Help',
     buttonTooltip: 'Open help menu',
@@ -184,14 +55,6 @@
       headerTextColor: '#ffcc33',       // Yellow header text
       separatorColor: '#e0e0e0',
       shadowColor: 'rgba(12, 50, 86, 0.25)',
-    },
-
-    // -- Default colors for menu items that don't specify their own --
-    menuItemDefaults: {
-      iconColor: '#165a9b',
-      bgColor: '#f0f6fc',
-      bgColorHover: '#dbeafe',
-      textColor: '#0c3256',
     },
 
     // -- Menu items --
@@ -227,12 +90,8 @@
     debug: false,
   };
 
-  // ---------------------------------------------------------------------------
-  // Config resolution: DEFAULT_CONFIG → theme preset → user overrides
-  // ---------------------------------------------------------------------------
-  var userConfig = window.helpButtonQsConfig || {};
-  var themePreset = THEME_PRESETS[userConfig.theme] || {};
-  var cfg = deepMerge(deepMerge(DEFAULT_CONFIG, themePreset), userConfig);
+  // Merge user config (deep merge for nested style objects)
+  var cfg = deepMerge(DEFAULT_CONFIG, window.helpButtonQsConfig || {});
 
   // ---------------------------------------------------------------------------
   // SVG icon library (16×16 viewBox)
@@ -500,20 +359,18 @@
 
   /** Build the inline style string for a specific menu item. */
   function menuItemStyle(item) {
-    var md = cfg.menuItemDefaults || {};
     return (
       buildStyles().menuItemBase + ';' +
-      'color:' + (item.textColor || md.textColor || '#333333') + ';' +
-      'background:' + (item.bgColor || md.bgColor || '#ffffff') + ';'
+      'color:' + (item.textColor || '#333333') + ';' +
+      'background:' + (item.bgColor || '#ffffff') + ';'
     );
   }
 
   /** Build the hover style for a specific menu item. */
   function menuItemHoverStyle(item) {
-    var md = cfg.menuItemDefaults || {};
     return (
-      'background:' + (item.bgColorHover || md.bgColorHover || '#f4f4f4') + ';' +
-      'border-left-color:' + (item.iconColor || md.iconColor || '#165a9b') + ';'
+      'background:' + (item.bgColorHover || '#f4f4f4') + ';' +
+      'border-left-color:' + (item.iconColor || '#165a9b') + ';'
     );
   }
 
@@ -623,7 +480,7 @@
       a.setAttribute('role', 'menuitem');
       a.setAttribute('style', baseStyle);
       a.innerHTML =
-        makeSvg(item.icon || 'help', 16, item.iconColor || (cfg.menuItemDefaults || {}).iconColor || '#165a9b') +
+        makeSvg(item.icon || 'help', 16, item.iconColor || '#165a9b') +
         '<span>' + escapeHtml(item.label) + '</span>';
 
       a.addEventListener('mouseenter', function () {

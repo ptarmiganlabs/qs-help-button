@@ -15,20 +15,6 @@
  */
 window.helpButtonQsConfig = {
   // --------------------------------------------------------------------------
-  // Teema-esiasetus (valinnainen)
-  // --------------------------------------------------------------------------
-  // Käytä ennalta määritettyä väripalettia. Valitse yksi seuraavista:
-  //   'default'        — Neutraali, minimalistinen harmaa
-  //   'leanGreen'      — Täyden spektrin Qlik-vihreä
-  //   'corporateBlue'  — Arvovaltainen sininen kultaisilla korostuksilla
-  //   'corporateGold'  — Lämmin kulta sinisillä korostuksilla
-  //
-  // Kun asetettu, teema tarjoaa oletusarvot buttonStyle-, popupStyle-,
-  // menuItemDefaults-asetuksille.
-  // Yksittäiset ominaisuudet alla ohittavat edelleen teeman.
-  // theme: 'corporateBlue',
-
-  // --------------------------------------------------------------------------
   // Työkalupalkin painike — teksti ja vihje
   // --------------------------------------------------------------------------
 

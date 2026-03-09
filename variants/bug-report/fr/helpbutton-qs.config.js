@@ -16,20 +16,6 @@
  */
 window.helpButtonQsConfig = {
   // --------------------------------------------------------------------------
-  // Thème prédéfini (optionnel)
-  // --------------------------------------------------------------------------
-  // Appliquer une palette de couleurs prédéfinie. Choisissez parmi :
-  //   'default'        — Gris neutre et minimaliste
-  //   'leanGreen'      — Vert Qlik complet
-  //   'corporateBlue'  — Bleu professionnel avec accents dorés
-  //   'corporateGold'  — Or chaud avec accents bleus
-  //
-  // Lorsqu'il est défini, le thème fournit des valeurs par défaut pour
-  // buttonStyle, popupStyle et menuItemDefaults et dialogStyle.
-  // Les propriétés individuelles ci-dessous remplacent toujours le thème.
-  // theme: 'corporateBlue',
-
-  // --------------------------------------------------------------------------
   // Bouton de la barre d'outils — texte et infobulle
   // --------------------------------------------------------------------------
 

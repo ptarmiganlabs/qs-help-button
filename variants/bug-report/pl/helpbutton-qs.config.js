@@ -14,20 +14,6 @@
  */
 window.helpButtonQsConfig = {
   // --------------------------------------------------------------------------
-  // Szablon kolorystyczny (opcjonalny)
-  // --------------------------------------------------------------------------
-  // Zastosuj predefiniowaną paletę kolorów. Wybierz jedną z:
-  //   'default'        — Neutralna, minimalistyczna szarość
-  //   'leanGreen'      — Pełne spektrum Qlik-zieleni
-  //   'corporateBlue'  — Profesjonalny niebieski ze złotymi akcentami
-  //   'corporateGold'  — Ciepłe złoto z niebieskimi akcentami
-  //
-  // Po ustawieniu szablon dostarcza wartości domyślne dla buttonStyle,
-  // popupStyle i menuItemDefaults i dialogStyle.
-  // Poszczególne właściwości poniżej nadal nadpisują szablon.
-  // theme: 'corporateBlue',
-
-  // --------------------------------------------------------------------------
   // Przycisk paska narzędzi — tekst i podpowiedź
   // --------------------------------------------------------------------------
 
