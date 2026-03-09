@@ -327,7 +327,7 @@ export default function ext(_galaxy) {
                                     label: 'URL (supports {{template}} fields)',
                                     type: 'string',
                                     defaultValue: 'https://example.com',
-                                    show: (item) => item.action !== 'bugReport',
+                                    show: (item) => !['bugReport', 'feedback'].includes(item.action),
                                 },
                                 target: {
                                     ref: 'target',
@@ -339,7 +339,7 @@ export default function ext(_galaxy) {
                                         { value: '_blank', label: 'New tab' },
                                         { value: '_self', label: 'Same tab' },
                                     ],
-                                    show: (item) => item.action !== 'bugReport',
+                                    show: (item) => !['bugReport', 'feedback'].includes(item.action),
                                 },
                                 icon: {
                                     ref: 'icon',
