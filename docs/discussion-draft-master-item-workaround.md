@@ -48,12 +48,15 @@ Qlik Sense's **Master Items** feature lets you define a reusable visualization o
 
 ```mermaid
 flowchart TD
-    A["Add HelpButton.qs extension to Sheet 1\n(and configure it in the property panel)"] --> B["In Edit Mode: right-click the extension\n→ 'Add to master items'"]
-    B --> C["Give the master item a name\ne.g. 'Help Button'"]
-    C --> D["For every other sheet:\nopen Edit Mode → Assets panel → Master visualizations"]
-    D --> E["Drag the 'Help Button' master item\nonto each sheet"]
-    E --> F["Optionally: make it invisible\n(enable 'Hide in Analysis Mode' placeholder)"]
-    F --> G["✅ Help button appears in toolbar\non whichever sheet user visits first"]
+    A["Add HelpButton.qs extension to Sheet 1
+    (and configure it in the property panel)"] --> B["In Edit Mode: right-click the extension
+    → 'Add to master items'"]
+    B --> C["Give the master item a name e.g. 'Help Button'"]
+    C --> D["For every other sheet:
+    open Edit Mode → Assets panel → Master items → Visualizations"]
+    D --> E["Drag the 'Help Button' master item onto each sheet"]
+    E --> F["Optionally: make it invisible (properties panel, Widget Appearance section)"]
+    F --> G["✅ Help button appears in toolbar on whichever sheet user visits first"]
 
     style G fill:#8f8,stroke:#0a0,color:#000
 ```
@@ -64,9 +67,9 @@ flowchart TD
 
 2. **Create a Master Item from it.** In Edit Mode, right-click the extension object and choose **Add to master items**. Give it a name like _Help Button_.
 
-3. **Add the master item to every other sheet.** On each sheet (in Edit Mode), open the **Assets** panel on the left → **Master visualizations** → drag the _Help Button_ master item onto the sheet.
+3. **Add the master item to every other sheet.** On each sheet (in Edit Mode), open the **Assets** panel on the left → **Master items** → drag the _Help Button_ master item onto the sheet.
 
-4. **Minimise its footprint (optional but recommended).** HelpButton.qs already has a built-in **"Show analysis placeholder"** toggle in the property panel. Disable it so the extension cell is invisible in Analysis Mode — end users will only see the toolbar button, not an empty cell on every sheet.
+4. **Minimise its footprint (optional but recommended).** HelpButton.qs already has a built-in **"Show placeholder text"** toggle in the property panel. Disable it so the extension cell is invisible in Analysis Mode — end users will only see the toolbar button, not an empty cell on every sheet. You can also disable the context and hover menus if you like, using toggles in the same section of the property panel.
 
 5. **Arrange it out of the way.** Place the master item in a corner of the sheet grid and resize it to 1×1 cells. Even hidden, the extension's grid cell exists and is what triggers the toolbar injection.
 
