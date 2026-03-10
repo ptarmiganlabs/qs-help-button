@@ -39,6 +39,22 @@ export const defaultPreset = {
     bgColorHover: toPickerObj("#e8e8e8"),
     textColor: toPickerObj("#333333"),
   },
+  menuItemTypeStyles: {
+    url: {
+      iconColor: toPickerObj("#595959"),
+      bgColor: toPickerObj("#f5f5f5"),
+      bgColorHover: toPickerObj("#e8e8e8"),
+      textColor: toPickerObj("#333333"),
+      icon: "link",
+    },
+    bugReport: {
+      iconColor: toPickerObj("#b45309"),
+      bgColor: toPickerObj("#fffbeb"),
+      bgColorHover: toPickerObj("#fef3c7"),
+      textColor: toPickerObj("#78350f"),
+      icon: "bug",
+    },
+  },
 };
 
 /**
@@ -64,6 +80,22 @@ export const leanGreenPreset = {
     bgColor: toPickerObj("#e8f5ee"),
     bgColorHover: toPickerObj("#c8ebd5"),
     textColor: toPickerObj("#004d25"),
+  },
+  menuItemTypeStyles: {
+    url: {
+      iconColor: toPickerObj("#009845"),
+      bgColor: toPickerObj("#e8f5ee"),
+      bgColorHover: toPickerObj("#c8ebd5"),
+      textColor: toPickerObj("#004d25"),
+      icon: "link",
+    },
+    bugReport: {
+      iconColor: toPickerObj("#b45309"),
+      bgColor: toPickerObj("#fffbeb"),
+      bgColorHover: toPickerObj("#fef3c7"),
+      textColor: toPickerObj("#78350f"),
+      icon: "bug",
+    },
   },
 };
 
@@ -91,6 +123,22 @@ export const corporateBluePreset = {
     bgColorHover: toPickerObj("#dbeafe"),
     textColor: toPickerObj("#0c3256"),
   },
+  menuItemTypeStyles: {
+    url: {
+      iconColor: toPickerObj("#165a9b"),
+      bgColor: toPickerObj("#f0f6fc"),
+      bgColorHover: toPickerObj("#dbeafe"),
+      textColor: toPickerObj("#0c3256"),
+      icon: "link",
+    },
+    bugReport: {
+      iconColor: toPickerObj("#dc2626"),
+      bgColor: toPickerObj("#fef2f2"),
+      bgColorHover: toPickerObj("#fee2e2"),
+      textColor: toPickerObj("#7f1d1d"),
+      icon: "bug",
+    },
+  },
 };
 
 /**
@@ -116,6 +164,22 @@ export const corporateGoldPreset = {
     bgColor: toPickerObj("#fffae6"),
     bgColorHover: toPickerObj("#fff3c4"),
     textColor: toPickerObj("#222222"),
+  },
+  menuItemTypeStyles: {
+    url: {
+      iconColor: toPickerObj("#165a9b"),
+      bgColor: toPickerObj("#fffae6"),
+      bgColorHover: toPickerObj("#fff3c4"),
+      textColor: toPickerObj("#222222"),
+      icon: "link",
+    },
+    bugReport: {
+      iconColor: toPickerObj("#165a9b"),
+      bgColor: toPickerObj("#eff6ff"),
+      bgColorHover: toPickerObj("#dbeafe"),
+      textColor: toPickerObj("#1e3a5f"),
+      icon: "bug",
+    },
   },
 };
 
@@ -153,20 +217,29 @@ export function applyPreset(data, presetKey) {
   if (!preset) return;
 
   // Button style
-  if (!data.buttonStyle) data.buttonStyle = {};
-  Object.assign(data.buttonStyle, preset.buttonStyle);
+  data.buttonStyle = { ...(data.buttonStyle || {}), ...preset.buttonStyle };
 
   // Popup style
-  if (!data.popupStyle) data.popupStyle = {};
-  Object.assign(data.popupStyle, preset.popupStyle);
+  data.popupStyle = { ...(data.popupStyle || {}), ...preset.popupStyle };
 
-  // Menu item colors — apply preset defaults to every item
+  // Menu item colors — apply type-specific styles when available
   if (data.menuItems && Array.isArray(data.menuItems)) {
-    data.menuItems.forEach((item) => {
-      item.iconColor = preset.menuItemDefaults.iconColor;
-      item.bgColor = preset.menuItemDefaults.bgColor;
-      item.bgColorHover = preset.menuItemDefaults.bgColorHover;
-      item.textColor = preset.menuItemDefaults.textColor;
+    const typeStyles = preset.menuItemTypeStyles;
+    data.menuItems = data.menuItems.map(item => {
+      const styleKey = item.action === 'bugReport' ? 'bugReport' : 'url';
+      const style = (typeStyles && typeStyles[styleKey]) || preset.menuItemDefaults;
+      const updates = {
+        ...item,
+        iconColor: style.iconColor,
+        bgColor: style.bgColor,
+        bgColorHover: style.bgColorHover,
+        textColor: style.textColor,
+      };
+      // Set icon for bug-report items; preserve user-chosen icon for URL items
+      if (item.action === 'bugReport' && style.icon) {
+        updates.icon = style.icon;
+      }
+      return updates;
     });
   }
 }
