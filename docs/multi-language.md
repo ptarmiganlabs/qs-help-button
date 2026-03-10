@@ -36,6 +36,8 @@ When you add the extension to a sheet and leave the text fields in the property 
 
 ### Translated strings
 
+Note: Not all of the strings listed below are visible in the property panel as of v2.0. The missing ones will be added as extension properties in a future release.
+
 The following UI elements have built-in defaults for all 9 languages:
 
 | UI Element | Translation Key | English Default |
@@ -52,7 +54,6 @@ The following UI elements have built-in defaults for all 9 languages:
 | Error toast | `bugReportErrorMessage` | Failed to submit bug report. Please try again. |
 | Context header | `bugReportContextHeader` | Context (auto-collected) |
 | Loading message | `bugReportLoadingMessage` | Gathering environment info… |
-| Edit-mode placeholder title | `editPlaceholderTitle` | HelpButton.qs |
 | Edit-mode placeholder description | `editPlaceholderDescription` | Injects a help button into the toolbar. Configure menu items in the property panel. |
 | Analysis-mode placeholder | `analysisPlaceholder` | Help button active in toolbar |
 
@@ -64,12 +65,12 @@ When the extension loads, it determines which language to use through a priority
 
 ```mermaid
 flowchart TD
-    A["Extension renders"] --> B{"Property panel\n'Language' = Auto-detect?"}
-    B -- "No — forced locale set" --> C["Use forced locale\n(e.g. sv, de, fr)"]
-    B -- "Yes (default)" --> D{"document.documentElement.lang\nattribute set?"}
-    D -- "Yes" --> E["Normalise & check\nagainst supported list"]
-    D -- "No" --> F{"navigator.language\navailable?"}
-    F -- "Yes" --> G["Normalise & check\nagainst supported list"]
+    A["Extension renders"] --> B{"Property panel 'Language' = Auto-detect?"}
+    B -- "No — forced locale set" --> C["Use forced locale (e.g. sv, de, fr)"]
+    B -- "Yes (default)" --> D{"Can we detect language from Sense app?"}
+    D -- "Yes" --> E["Normalise & check against supported list"]
+    D -- "No" --> F{"navigator.language available?"}
+    F -- "Yes" --> G["Normalise & check against supported list"]
     F -- "No" --> H["Fallback → en"]
     E -- Supported --> I["Use detected locale"]
     E -- "Not supported" --> F
@@ -130,11 +131,11 @@ In the property panel, the **Language** section contains a dropdown with two kin
 ```mermaid
 flowchart TD
     DEV["Developer opens\nproperty panel"] --> DD["Language dropdown"]
-    DD -- "Auto-detect" --> CLEAR["All text fields are cleared\n(empty = use detected defaults)"]
-    DD -- "Specific language\n(e.g. Deutsch)" --> FILL["Text fields are pre-filled\nwith that language's defaults"]
-    CLEAR --> RT["At runtime:\nresolveText uses\nauto-detected locale"]
-    FILL --> EDIT["Developer can edit\nany pre-filled value"]
-    EDIT --> RT2["At runtime:\nresolveText returns\ncustom value or forced locale default"]
+    DD -- "Auto-detect" --> CLEAR["All text fields are cleared (empty = use detected defaults)"]
+    DD -- "Specific language (e.g. Deutsch)" --> FILL["Text fields are pre-filled with that language's defaults"]
+    CLEAR --> RT["At runtime: resolveText uses auto-detected locale"]
+    FILL --> EDIT["Developer can edit any pre-filled value"]
+    EDIT --> RT2["At runtime: resolveText returns custom value or forced locale default"]
 ```
 
 ### What happens when you change the dropdown
@@ -157,7 +158,7 @@ The diagram below shows how the main components fit together at a high level.
 flowchart TB
     subgraph "Property Panel (Edit Mode)"
         LP["Language dropdown"]
-        PP["Text fields\n(button label, tooltip, etc.)"]
+        PP["Text fields (button label, tooltip, etc.)"]
     end
 
     subgraph "i18n Module"
@@ -166,7 +167,7 @@ flowchart TB
         GEL["getEffectiveLocale()"]
         GT["getTranslation()"]
         RT["resolveText()"]
-        TT["translations table\n(9 languages × 15 keys)"]
+        TT["translations table (9 languages × 15 keys)"]
     end
 
     subgraph "UI Components (Analysis Mode)"
@@ -222,10 +223,10 @@ Leave the dropdown on **Auto-detect** but type a custom value in one or more tex
 
 ```mermaid
 flowchart LR
-    A["Property panel\nvalue"] -->|non-empty| USE_PP["Use as-is"]
-    A -->|empty| B["Translation table\nlookup for locale"]
-    B -->|found| USE_TR["Use translated\ndefault"]
-    B -->|not found| C["English\nfallback"]
+    A["Property panel value"] -->|non-empty| USE_PP["Use as-is"]
+    A -->|empty| B["Translation table lookup for locale"]
+    B -->|found| USE_TR["Use translated default"]
+    B -->|not found| C["English fallback"]
     C --> USE_EN["Use English default"]
 ```
 
