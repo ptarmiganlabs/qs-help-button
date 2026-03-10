@@ -1,12 +1,14 @@
-# Multi-Language Support
+# 🌐 Multi-Language Support in HelpButton.qs
 
-The HelpButton.qs **extension** automatically translates its UI strings to match the language of the Qlik Sense client. This page explains how the translation system works, what "defaults" mean, and how you as an app developer can customise the behaviour.
+The [HelpButton.qs](https://github.com/ptarmiganlabs/help-button.qs) extension injects a configurable help button into the Qlik Sense toolbar — and as of the latest release, **it automatically translates every UI string** to match the language of the Qlik Sense client.
 
-> **Scope:** This document covers the **extension variant** only (the `.qext` package installed via the Management Console). The HTML-injection variants have a different localisation model and are not covered here.
+This post walks through how the built-in translation system works, what "defaults" mean, and how you as a Qlik Sense app developer can take advantage of it.
+
+> **Scope:** This covers the **extension variant** only (the `.qext` package installed via the Management Console). The HTML-injection variants have a different localisation model and are not covered here.
 
 ---
 
-## Supported Languages
+## 🗣️ Supported Languages
 
 The extension ships with built-in translations for **9 languages**:
 
@@ -26,7 +28,7 @@ English (`en`) is the **ultimate fallback** — if the detected or forced locale
 
 ---
 
-## What Are "Defaults"?
+## 💡 What Are "Defaults"?
 
 Every visible text string in the extension — the toolbar button label, its tooltip, the popup title, and all bug-report dialog texts — has a **built-in default value** for each supported language. These defaults are stored inside the extension bundle in a translations table.
 
@@ -56,7 +58,7 @@ The following UI elements have built-in defaults for all 9 languages:
 
 ---
 
-## How Language Detection Works
+## 🔍 How Language Detection Works
 
 When the extension loads, it determines which language to use through a priority chain. The first source that yields a supported locale wins.
 
@@ -81,7 +83,7 @@ Norwegian Bokmål (`nb`) and Nynorsk (`nn`) are both normalised to `no` automati
 
 ---
 
-## How Text Resolution Works
+## ⚙️ How Text Resolution Works
 
 The core of the translation system is the **`resolveText`** function. Every time the extension needs to display a translatable string, it calls `resolveText` with two inputs:
 
@@ -116,7 +118,7 @@ If the same developer types `Support` into the Button label field, `resolveText(
 
 ---
 
-## The Language Dropdown
+## 🔧 The Language Dropdown
 
 In the property panel, the **Language** section contains a dropdown with two kinds of options:
 
@@ -147,7 +149,7 @@ flowchart TD
 
 ---
 
-## Architecture Overview
+## 🏗️ Architecture Overview
 
 The diagram below shows how the main components fit together at a high level.
 
@@ -188,7 +190,7 @@ flowchart TB
 
 ---
 
-## Common Scenarios
+## 📋 Common Scenarios
 
 ### Scenario 1 — Fully automatic (recommended)
 
@@ -216,7 +218,7 @@ Leave the dropdown on **Auto-detect** but type a custom value in one or more tex
 
 ---
 
-## Fallback Chain Summary
+## 🔗 Fallback Chain Summary
 
 ```mermaid
 flowchart LR
@@ -232,3 +234,13 @@ flowchart LR
 | 1 | Property-panel value | Developer typed a custom string |
 | 2 | Translation for active locale | Field is empty and locale has a translation |
 | 3 | English (`en`) translation | Field is empty and locale is unsupported |
+
+---
+
+## 📦 Get Started
+
+- **Source & releases:** [github.com/ptarmiganlabs/help-button.qs](https://github.com/ptarmiganlabs/help-button.qs)
+- **Installation guide:** see the [extension README](https://github.com/ptarmiganlabs/help-button.qs/blob/main/extension/README.md)
+- **Template fields (dynamic URLs):** see [docs/template-fields.md](https://github.com/ptarmiganlabs/help-button.qs/blob/main/docs/template-fields.md)
+
+Questions or feedback? Drop a comment below! 👇
