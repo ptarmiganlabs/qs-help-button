@@ -8,6 +8,7 @@
 - **Cross-Platform Support**: Automatically detects and works on both **Qlik Sense SaaS (Cloud)** and **Client-Managed Qlik Sense (Enterprise)** environments, with same features on both platforms.
 - **Invisible Footprint**: The extension cell itself can be configured to be invisible to end-users on the sheet, suppressing default interactive grid cell menus and hover menus.
 - **Extensive Customization**: Configure colors, icons, languages, and menu actions directly from the Qlik Sense property panel.
+- **Theme Presets**: Apply one of four predefined color palettes (Default, Lean Green, Corporate Blue, Corporate Gold) to instantly style the toolbar button, popup, and menu items to your corporate brand.
 - **Context-Aware Links**: Dynamically pass application context (such as App ID, Sheet ID, and user details) to outbound links using template tags.
 
 ## Audience
@@ -18,8 +19,8 @@ This extension is designed to be added by **Qlik Sense Administrators and Develo
 
 When you drag and drop the extension onto a sheet:
 
-1. In **Edit Mode**: It displays a placeholder within the grid cell. This allows developers to select it and configure its settings via the standard Qlik Sense Property Panel.
-2. In **Analysis Mode**: The extension dynamically removes itself from the sheet's visual flow and injects a button into the top application toolbar.
+1. In **Edit Mode**: It displays a placeholder within the grid cell indicating the current active features (e.g. `4 menu items · Bug report: On · Feedback: On` where "On" implies at least one active menu item is configured with that corresponding action type). The help button itself also remains visible down in the grid cell, allowing developers to immediately test menu items while configuring them via the standard Qlik Sense Property Panel.
+2. In **Analysis Mode**: The extension dynamically removes itself from the sheet's visual flow and injects the actual button into the top application toolbar.
 
 ```mermaid
 flowchart TD
@@ -41,7 +42,7 @@ flowchart TD
 ## Usage
 
 1. Open your Qlik Sense application in Edit Mode.
-2. Drag the **Help Button** extension from the Custom Objects panel onto your sheet.
+2. Drag the **HelpButton.qs** extension from the **.qs Library** bundle inside the Custom Objects panel onto your sheet.
 3. Configure the appearance, links, and behavior in the Property Panel on the right.
 4. Switch to Analysis Mode to see the button appear in the top toolbar.
 
