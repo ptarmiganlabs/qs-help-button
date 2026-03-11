@@ -1,8 +1,17 @@
 import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
+/** Bundle metadata injected into the .qext file. */
+const BUNDLE_METADATA = {
+    id: 'dot-qs-library',
+    name: '.qs Library',
+    description:
+        'Extensions from Ptarmigan Labs that enhance the user experience with help capabilities, onboarding tours and more.',
+};
+
 /**
- * Post-build script that replaces build-time tokens in output files.
+ * Post-build script that replaces build-time tokens in output files
+ * and injects bundle metadata into the .qext manifest.
  *
  * @returns {Promise<void>} Resolves when all tokens are replaced.
  */
@@ -39,6 +48,17 @@ async function main() {
                 console.error(`Error processing directory ${dir}:`, err);
             }
         }
+    }
+
+    // Inject bundle metadata into the .qext manifest
+    const qextPath = join('helpbutton-qs-ext', 'helpbutton-qs.qext');
+    try {
+        const qext = JSON.parse(await readFile(qextPath, 'utf-8'));
+        qext.bundle = BUNDLE_METADATA;
+        await writeFile(qextPath, JSON.stringify(qext, null, 2) + '\n');
+        console.log(`Post-build: Injected bundle metadata into ${qextPath}`);
+    } catch (err) {
+        console.error(`Error injecting bundle into ${qextPath}:`, err);
     }
 }
 
