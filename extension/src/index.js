@@ -253,14 +253,16 @@ function renderEditPlaceholder(element, layout) {
         (hasBugReport ? ' · Bug report: On' : '') +
         (hasFeedback ? ' · Feedback: On' : '');
 
+    const placeholderTitle = escapeHtml(resolveText('', 'editPlaceholderTitle'));
+
     element.innerHTML = `
         <div class="hbqs-edit-placeholder"
-             title="HelpButton.qs — ${statsText}">
+             title="${placeholderTitle} — ${statsText}">
             <div class="hbqs-edit-placeholder-info">
                 <div class="hbqs-edit-placeholder-icon">
                     ${makeSvg('help', 32, '#165a9b')}
                 </div>
-                <div class="hbqs-edit-placeholder-title">HelpButton.qs</div>
+                <div class="hbqs-edit-placeholder-title">${placeholderTitle}</div>
                 <div class="hbqs-edit-placeholder-stats">${statsText}</div>
                 <div class="hbqs-edit-placeholder-actions">
                     <button class="hbqs-btn hbqs-btn--ghost hbqs-about-btn"

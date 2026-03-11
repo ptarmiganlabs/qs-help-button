@@ -1,7 +1,7 @@
 /**
  * Property panel definition for HelpButton.qs extension.
  *
- * Section order: Widget → Theme & Styling → Language → Button → Popup → Menu Items → Template Fields → About
+ * Section order: Widget → Theme & Styling → Language & Translations → Button → Popup → Menu Items → Template Fields → About
  *
  * @param {object} galaxy - Nebula galaxy object.
  * @returns {object} Extension property panel configuration.
@@ -58,13 +58,6 @@ export default function ext(_galaxy) {
                                 { value: false, label: 'Hide' },
                             ],
                         },
-                        analysisPlaceholderText: {
-                            ref: 'widget.analysisPlaceholderText',
-                            label: 'Analysis placeholder text (empty = auto)',
-                            type: 'string',
-                            defaultValue: '',
-                            show: (layout) => layout.widget?.showAnalysisPlaceholder !== false,
-                        },
                     },
                 },
 
@@ -99,17 +92,22 @@ export default function ext(_galaxy) {
                 },
 
                 // ---------------------------------------------------------------
-                // Language override
+                // Language & Translations
                 // ---------------------------------------------------------------
                 languageSection: {
-                    type: 'items',
-                    label: 'Language',
+                    component: 'expandable-items',
+                    label: 'Language & Translations',
                     items: {
-                        languageInfo: {
-                            component: 'text',
-                            label: 'By default, the extension auto-detects the Qlik UI language. Override here to force a specific locale for all translated strings.',
-                        },
-                        language: {
+                        // -- Language selection --
+                        languageSelection: {
+                            type: 'items',
+                            label: 'Language Selection',
+                            items: {
+                                languageInfo: {
+                                    component: 'text',
+                                    label: 'Auto-detects the Qlik UI language by default. Override here to force a specific locale. Leave text fields empty to use built-in translations.',
+                                },
+                                language: {
                             ref: 'language',
                             label: 'Language',
                             type: 'string',
@@ -134,19 +132,41 @@ export default function ext(_galaxy) {
 
                                 const isAuto = data.language === 'auto';
                                 const msg = isAuto
-                                    ? 'Setting language to Auto-detect will clear all your translated fields to allow automatic translation. Continue?'
-                                    : `Setting language to a specific locale will overwrite all your translation fields with the standard ${data.language.toUpperCase()} texts. Continue?`;
+                                    ? 'Setting language to Auto-detect will clear all translated fields to allow automatic translation. Continue?'
+                                    : `Setting language to a specific locale will overwrite all translated fields with the standard ${data.language.toUpperCase()} texts. Continue?`;
 
                                 if (window.confirm(msg)) {
                                     data._lastLanguage = data.language;
 
                                     if (isAuto) {
+                                        // Clear all translatable fields
                                         data.buttonLabel = '';
                                         data.buttonTooltip = '';
                                         data.popupTitle = '';
                                         if (data.widget) {
                                             data.widget.analysisPlaceholderText = '';
                                         }
+                                        // Global bug-report strings
+                                        if (!data.bugReportStrings) data.bugReportStrings = {};
+                                        data.bugReportStrings.title = '';
+                                        data.bugReportStrings.descriptionLabel = '';
+                                        data.bugReportStrings.descriptionPlaceholder = '';
+                                        data.bugReportStrings.submitButton = '';
+                                        data.bugReportStrings.cancelButton = '';
+                                        data.bugReportStrings.successMessage = '';
+                                        data.bugReportStrings.errorMessage = '';
+                                        data.bugReportStrings.loadingMessage = '';
+                                        // Global feedback strings
+                                        if (!data.feedbackStrings) data.feedbackStrings = {};
+                                        data.feedbackStrings.title = '';
+                                        data.feedbackStrings.ratingLabel = '';
+                                        data.feedbackStrings.commentLabel = '';
+                                        data.feedbackStrings.commentPlaceholder = '';
+                                        data.feedbackStrings.submitButton = '';
+                                        data.feedbackStrings.cancelButton = '';
+                                        data.feedbackStrings.successMessage = '';
+                                        data.feedbackStrings.errorMessage = '';
+                                        // Per-item dialog titles
                                         if (data.menuItems && Array.isArray(data.menuItems)) {
                                             data.menuItems.forEach((item) => {
                                                 if (item.action === 'bugReport' && item.bugReport && item.bugReport.dialogStrings) {
@@ -162,10 +182,31 @@ export default function ext(_galaxy) {
                                         data.buttonLabel = translations.buttonLabel[lang] || '';
                                         data.buttonTooltip = translations.buttonTooltip[lang] || '';
                                         data.popupTitle = translations.popupTitle[lang] || '';
-                                        
+
                                         if (!data.widget) data.widget = {};
                                         data.widget.analysisPlaceholderText = translations.analysisPlaceholder[lang] || '';
 
+                                        // Global bug-report strings
+                                        if (!data.bugReportStrings) data.bugReportStrings = {};
+                                        data.bugReportStrings.title = translations.bugReportTitle[lang] || '';
+                                        data.bugReportStrings.descriptionLabel = translations.bugReportDescriptionLabel[lang] || '';
+                                        data.bugReportStrings.descriptionPlaceholder = translations.bugReportDescriptionPlaceholder[lang] || '';
+                                        data.bugReportStrings.submitButton = translations.bugReportSubmit[lang] || '';
+                                        data.bugReportStrings.cancelButton = translations.bugReportCancel[lang] || '';
+                                        data.bugReportStrings.successMessage = translations.bugReportSuccessMessage[lang] || '';
+                                        data.bugReportStrings.errorMessage = translations.bugReportErrorMessage[lang] || '';
+                                        data.bugReportStrings.loadingMessage = translations.bugReportLoadingMessage[lang] || '';
+                                        // Global feedback strings
+                                        if (!data.feedbackStrings) data.feedbackStrings = {};
+                                        data.feedbackStrings.title = translations.feedbackTitle[lang] || '';
+                                        data.feedbackStrings.ratingLabel = translations.feedbackRatingLabel[lang] || '';
+                                        data.feedbackStrings.commentLabel = translations.feedbackCommentLabel[lang] || '';
+                                        data.feedbackStrings.commentPlaceholder = translations.feedbackCommentPlaceholder[lang] || '';
+                                        data.feedbackStrings.submitButton = translations.feedbackSubmit[lang] || '';
+                                        data.feedbackStrings.cancelButton = translations.feedbackCancel[lang] || '';
+                                        data.feedbackStrings.successMessage = translations.feedbackSuccessMessage[lang] || '';
+                                        data.feedbackStrings.errorMessage = translations.feedbackErrorMessage[lang] || '';
+                                        // Per-item dialog titles
                                         if (data.menuItems && Array.isArray(data.menuItems)) {
                                             data.menuItems.forEach((item) => {
                                                 if (item.action === 'bugReport') {
@@ -187,6 +228,181 @@ export default function ext(_galaxy) {
                                 }
                             }
                         },
+                            },
+                        },
+
+                        // -- Button text --
+                        buttonTexts: {
+                            type: 'items',
+                            label: 'Button',
+                            items: {
+                                buttonTextsInfo: {
+                                    component: 'text',
+                                    label: 'Toolbar button text overrides. Leave empty to auto-translate.',
+                                },
+                                buttonLabel: {
+                                    ref: 'buttonLabel',
+                                    label: 'Button label',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                buttonTooltip: {
+                                    ref: 'buttonTooltip',
+                                    label: 'Button tooltip',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                            },
+                        },
+
+                        // -- Popup text --
+                        popupTexts: {
+                            type: 'items',
+                            label: 'Popup',
+                            items: {
+                                popupTitle: {
+                                    ref: 'popupTitle',
+                                    label: 'Popup heading',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                            },
+                        },
+
+                        // -- Bug Report Dialog strings --
+                        bugReportTexts: {
+                            type: 'items',
+                            label: 'Bug Report Dialog',
+                            items: {
+                                bugReportTextsInfo: {
+                                    component: 'text',
+                                    label: 'Overrides for the bug-report dialog. Leave empty to auto-translate.',
+                                },
+                                brTitle: {
+                                    ref: 'bugReportStrings.title',
+                                    label: 'Dialog title',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                brDescriptionLabel: {
+                                    ref: 'bugReportStrings.descriptionLabel',
+                                    label: 'Description field label',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                brDescriptionPlaceholder: {
+                                    ref: 'bugReportStrings.descriptionPlaceholder',
+                                    label: 'Description placeholder',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                brSubmitButton: {
+                                    ref: 'bugReportStrings.submitButton',
+                                    label: 'Submit button text',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                brCancelButton: {
+                                    ref: 'bugReportStrings.cancelButton',
+                                    label: 'Cancel button text',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                brSuccessMessage: {
+                                    ref: 'bugReportStrings.successMessage',
+                                    label: 'Success message',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                brErrorMessage: {
+                                    ref: 'bugReportStrings.errorMessage',
+                                    label: 'Error message',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                brLoadingMessage: {
+                                    ref: 'bugReportStrings.loadingMessage',
+                                    label: 'Loading message',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                            },
+                        },
+
+                        // -- Feedback Dialog strings --
+                        feedbackTexts: {
+                            type: 'items',
+                            label: 'Feedback Dialog',
+                            items: {
+                                feedbackTextsInfo: {
+                                    component: 'text',
+                                    label: 'Overrides for the feedback dialog. Leave empty to auto-translate.',
+                                },
+                                fbTitle: {
+                                    ref: 'feedbackStrings.title',
+                                    label: 'Dialog title',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                fbRatingLabel: {
+                                    ref: 'feedbackStrings.ratingLabel',
+                                    label: 'Rating label',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                fbCommentLabel: {
+                                    ref: 'feedbackStrings.commentLabel',
+                                    label: 'Comment field label',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                fbCommentPlaceholder: {
+                                    ref: 'feedbackStrings.commentPlaceholder',
+                                    label: 'Comment placeholder',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                fbSubmitButton: {
+                                    ref: 'feedbackStrings.submitButton',
+                                    label: 'Submit button text',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                fbCancelButton: {
+                                    ref: 'feedbackStrings.cancelButton',
+                                    label: 'Cancel button text',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                fbSuccessMessage: {
+                                    ref: 'feedbackStrings.successMessage',
+                                    label: 'Success message',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                                fbErrorMessage: {
+                                    ref: 'feedbackStrings.errorMessage',
+                                    label: 'Error message',
+                                    type: 'string',
+                                    defaultValue: '',
+                                },
+                            },
+                        },
+
+                        // -- General texts --
+                        generalTexts: {
+                            type: 'items',
+                            label: 'General',
+                            items: {
+                                analysisPlaceholderText: {
+                                    ref: 'widget.analysisPlaceholderText',
+                                    label: 'Analysis-mode placeholder text',
+                                    type: 'string',
+                                    defaultValue: '',
+                                    show: (layout) => layout.widget?.showAnalysisPlaceholder !== false,
+                                },
+                            },
+                        },
                     },
                 },
 
@@ -197,18 +413,6 @@ export default function ext(_galaxy) {
                     type: 'items',
                     label: 'Button Appearance',
                     items: {
-                        buttonLabel: {
-                            ref: 'buttonLabel',
-                            label: 'Button label (empty = auto-translate)',
-                            type: 'string',
-                            defaultValue: '',
-                        },
-                        buttonTooltip: {
-                            ref: 'buttonTooltip',
-                            label: 'Button tooltip (empty = auto-translate)',
-                            type: 'string',
-                            defaultValue: '',
-                        },
                         buttonIcon: {
                             ref: 'buttonIcon',
                             label: 'Button icon',
@@ -271,12 +475,6 @@ export default function ext(_galaxy) {
                     type: 'items',
                     label: 'Popup Appearance',
                     items: {
-                        popupTitle: {
-                            ref: 'popupTitle',
-                            label: 'Popup heading (empty = auto-translate)',
-                            type: 'string',
-                            defaultValue: '',
-                        },
                         popupColorsHeader: {
                             component: 'text',
                             label: 'Popup colors',
@@ -434,7 +632,7 @@ export default function ext(_galaxy) {
                                 },
                                 dialogTitle: {
                                     ref: 'bugReport.dialogStrings.title',
-                                    label: 'Dialog title (empty = auto)',
+                                    label: 'Dialog title override (overrides global)',
                                     type: 'string',
                                     defaultValue: '',
                                     show: (item) => item.action === 'bugReport',
@@ -519,7 +717,7 @@ export default function ext(_galaxy) {
                                 },
                                 feedbackDialogTitle: {
                                     ref: 'feedback.dialogStrings.title',
-                                    label: 'Dialog title (empty = auto)',
+                                    label: 'Dialog title override (overrides global)',
                                     type: 'string',
                                     defaultValue: '',
                                     show: (item) => item.action === 'feedback',
