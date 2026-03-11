@@ -44,6 +44,30 @@ export default {
         borderRadius: '4px',
     },
 
+    // -- Global bug-report dialog strings (empty = auto-translate) --
+    bugReportStrings: {
+        title: '',
+        descriptionLabel: '',
+        descriptionPlaceholder: '',
+        submitButton: '',
+        cancelButton: '',
+        successMessage: '',
+        errorMessage: '',
+        loadingMessage: '',
+    },
+
+    // -- Global feedback dialog strings (empty = auto-translate) --
+    feedbackStrings: {
+        title: '',
+        ratingLabel: '',
+        commentLabel: '',
+        commentPlaceholder: '',
+        submitButton: '',
+        cancelButton: '',
+        successMessage: '',
+        errorMessage: '',
+    },
+
     // -- Popup appearance --
     popupTitle: '',
     popupStyle: {

@@ -83,9 +83,34 @@ export function injectHelpButton(layout, adapter, platform) {
     const bugReportItem = menuItems.find((item) => item.action === 'bugReport');
     const bugReport = bugReportItem ? bugReportItem.bugReport || {} : null;
 
+    // Merge global bug-report strings into per-item dialogStrings.
+    // Per-item values (when non-empty) override global values.
+    if (bugReport) {
+        const globalBr = layout.bugReportStrings || {};
+        const perItem = bugReport.dialogStrings || {};
+        bugReport.dialogStrings = { ...globalBr };
+        Object.entries(perItem).forEach(([k, v]) => {
+            if (v !== undefined && v !== null && v !== '') {
+                bugReport.dialogStrings[k] = v;
+            }
+        });
+    }
+
     // Derive feedback config from the first menu item with action='feedback'
     const feedbackItem = menuItems.find((item) => item.action === 'feedback');
     const feedbackConfig = feedbackItem ? feedbackItem.feedback || {} : null;
+
+    // Merge global feedback strings into per-item dialogStrings.
+    if (feedbackConfig) {
+        const globalFb = layout.feedbackStrings || {};
+        const perItem = feedbackConfig.dialogStrings || {};
+        feedbackConfig.dialogStrings = { ...globalFb };
+        Object.entries(perItem).forEach(([k, v]) => {
+            if (v !== undefined && v !== null && v !== '') {
+                feedbackConfig.dialogStrings[k] = v;
+            }
+        });
+    }
 
     // Resolve button colors (handles both color-picker objects and plain strings)
     const btnBg = resolveColor(buttonStyle.backgroundColor, '#165a9b');
