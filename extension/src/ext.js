@@ -1,7 +1,7 @@
 /**
  * Property panel definition for HelpButton.qs extension.
  *
- * Section order: Language → Widget → Button → Popup → Menu Items → Template Fields → About
+ * Section order: Widget → Theme & Styling → Language → Button → Popup → Menu Items → Template Fields → About
  *
  * @param {object} galaxy - Nebula galaxy object.
  * @returns {object} Extension property panel configuration.
@@ -19,11 +19,61 @@ export default function ext(_galaxy) {
             component: 'accordion',
             items: {
                 // ---------------------------------------------------------------
+                // Widget (grid cell) appearance
+                // ---------------------------------------------------------------
+                widgetSection: {
+                    type: 'items',
+                    label: 'Widget Appearance',
+                    items: {
+                        hideHoverMenu: {
+                            ref: 'widget.hideHoverMenu',
+                            label: 'Hide hover menu',
+                            type: 'boolean',
+                            defaultValue: false,
+                            component: 'switch',
+                            options: [
+                                { value: true, label: 'Hidden' },
+                                { value: false, label: 'Visible' },
+                            ],
+                        },
+                        hideContextMenu: {
+                            ref: 'widget.hideContextMenu',
+                            label: 'Hide context menu',
+                            type: 'boolean',
+                            defaultValue: false,
+                            component: 'switch',
+                            options: [
+                                { value: true, label: 'Hidden' },
+                                { value: false, label: 'Visible' },
+                            ],
+                        },
+                        showAnalysisPlaceholder: {
+                            ref: 'widget.showAnalysisPlaceholder',
+                            label: 'Show placeholder text in analysis mode',
+                            type: 'boolean',
+                            defaultValue: true,
+                            component: 'switch',
+                            options: [
+                                { value: true, label: 'Show' },
+                                { value: false, label: 'Hide' },
+                            ],
+                        },
+                        analysisPlaceholderText: {
+                            ref: 'widget.analysisPlaceholderText',
+                            label: 'Analysis placeholder text (empty = auto)',
+                            type: 'string',
+                            defaultValue: '',
+                            show: (layout) => layout.widget?.showAnalysisPlaceholder !== false,
+                        },
+                    },
+                },
+
+                // ---------------------------------------------------------------
                 // Theme preset
                 // ---------------------------------------------------------------
                 themeSection: {
                     type: 'items',
-                    label: 'Theme',
+                    label: 'Theme & Styling',
                     items: {
                         themeInfo: {
                             component: 'text',
@@ -34,18 +84,15 @@ export default function ext(_galaxy) {
                             label: 'Theme preset',
                             type: 'string',
                             component: 'dropdown',
-                            defaultValue: '',
+                            defaultValue: 'default',
                             options: [
-                                { value: '', label: '(No preset — custom colors)' },
                                 ...Object.entries(PRESET_LABELS).map(([key, label]) => ({
                                     value: key,
                                     label,
                                 })),
                             ],
                             change: (data) => {
-                                if (data.themePreset) {
-                                    applyPreset(data, data.themePreset);
-                                }
+                                applyPreset(data, data.themePreset);
                             },
                         },
                     },
@@ -139,56 +186,6 @@ export default function ext(_galaxy) {
                                     data.language = data._lastLanguage;
                                 }
                             }
-                        },
-                    },
-                },
-
-                // ---------------------------------------------------------------
-                // Widget (grid cell) appearance
-                // ---------------------------------------------------------------
-                widgetSection: {
-                    type: 'items',
-                    label: 'Widget Appearance',
-                    items: {
-                        hideHoverMenu: {
-                            ref: 'widget.hideHoverMenu',
-                            label: 'Hide hover menu',
-                            type: 'boolean',
-                            defaultValue: false,
-                            component: 'switch',
-                            options: [
-                                { value: true, label: 'Hidden' },
-                                { value: false, label: 'Visible' },
-                            ],
-                        },
-                        hideContextMenu: {
-                            ref: 'widget.hideContextMenu',
-                            label: 'Hide context menu',
-                            type: 'boolean',
-                            defaultValue: false,
-                            component: 'switch',
-                            options: [
-                                { value: true, label: 'Hidden' },
-                                { value: false, label: 'Visible' },
-                            ],
-                        },
-                        showAnalysisPlaceholder: {
-                            ref: 'widget.showAnalysisPlaceholder',
-                            label: 'Show placeholder text in analysis mode',
-                            type: 'boolean',
-                            defaultValue: true,
-                            component: 'switch',
-                            options: [
-                                { value: true, label: 'Show' },
-                                { value: false, label: 'Hide' },
-                            ],
-                        },
-                        analysisPlaceholderText: {
-                            ref: 'widget.analysisPlaceholderText',
-                            label: 'Analysis placeholder text (empty = auto)',
-                            type: 'string',
-                            defaultValue: '',
-                            show: (layout) => layout.widget?.showAnalysisPlaceholder !== false,
                         },
                     },
                 },
