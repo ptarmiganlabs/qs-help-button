@@ -1,6 +1,6 @@
 # 🌐 Multi-Language Support in HelpButton.qs
 
-The [HelpButton.qs](https://github.com/ptarmiganlabs/help-button.qs) extension injects a configurable help button into the Qlik Sense toolbar — and as of the latest release, **it automatically translates every UI string** to match the language of the Qlik Sense client.
+The [HelpButton.qs](https://github.com/ptarmiganlabs/help-button.qs) extension injects a configurable help button into the Qlik Sense toolbar — and as of the latest release, **it automatically translates every UI string** to match the language of the Qlik Sense client. This includes the toolbar button, popup menu, bug-report dialog, and the new **feedback dialog**.
 
 This post walks through how the built-in translation system works, what "defaults" mean, and how you as a Qlik Sense app developer can take advantage of it.
 
@@ -30,32 +30,45 @@ English (`en`) is the **ultimate fallback** — if the detected or forced locale
 
 ## 💡 What Are "Defaults"?
 
-Every visible text string in the extension — the toolbar button label, its tooltip, the popup title, and all bug-report dialog texts — has a **built-in default value** for each supported language. These defaults are stored inside the extension bundle in a translations table.
+Every visible text string in the extension — the toolbar button label, its tooltip, the popup title, all bug-report dialog texts, and all feedback dialog texts — has a **built-in default value** for each supported language. These defaults are stored inside the extension bundle in a translations table.
 
 When you add the extension to a sheet and leave the text fields in the property panel **empty**, the extension does not show blank text. Instead it automatically fills in the correct default for the active language. This is what "default" means in the context of HelpButton translations: **the pre-packaged translated string that is used when the developer has not typed a custom value.**
 
 ### Translated strings
 
-Note: Not all of the strings listed below are visible in the property panel as of v2.0. The missing ones will be added as extension properties in a future release.
+The following UI elements have built-in defaults for all 9 languages (23 translation keys in total).
 
-The following UI elements have built-in defaults for all 9 languages:
+Most strings are configurable via the property panel. The exceptions are noted below — these are used internally by the extension and are not exposed as editable fields.
 
-| UI Element | Translation Key | English Default |
-|---|---|---|
-| Toolbar button label | `buttonLabel` | Help |
-| Toolbar button tooltip | `buttonTooltip` | Open help menu |
-| Popup title | `popupTitle` | Need assistance? |
-| Bug-report dialog title | `bugReportTitle` | Report a Bug |
-| Description field label | `bugReportDescriptionLabel` | Description |
-| Description placeholder | `bugReportDescriptionPlaceholder` | Describe the issue you encountered… |
-| Submit button | `bugReportSubmit` | Submit |
-| Cancel button | `bugReportCancel` | Cancel |
-| Success toast | `bugReportSuccessMessage` | Bug report submitted successfully! |
-| Error toast | `bugReportErrorMessage` | Failed to submit bug report. Please try again. |
-| Context header | `bugReportContextHeader` | Context (auto-collected) |
-| Loading message | `bugReportLoadingMessage` | Gathering environment info… |
-| Edit-mode placeholder description | `editPlaceholderDescription` | Injects a help button into the toolbar. Configure menu items in the property panel. |
-| Analysis-mode placeholder | `analysisPlaceholder` | Help button active in toolbar |
+| UI Element | Translation Key | English Default | In property panel? |
+|---|---|---|---|
+| **Toolbar & popup** | | | |
+| Toolbar button label | `buttonLabel` | Help | ✅ |
+| Toolbar button tooltip | `buttonTooltip` | Open help menu | ✅ |
+| Popup title | `popupTitle` | Need assistance? | ✅ |
+| **Bug-report dialog** | | | |
+| Dialog title | `bugReportTitle` | Report a Bug | ✅ |
+| Description field label | `bugReportDescriptionLabel` | Description | ✅ |
+| Description placeholder | `bugReportDescriptionPlaceholder` | Describe the issue you encountered… | ✅ |
+| Submit button | `bugReportSubmit` | Submit | ✅ |
+| Cancel button | `bugReportCancel` | Cancel | ✅ |
+| Success toast | `bugReportSuccessMessage` | Bug report submitted successfully! | ✅ |
+| Error toast | `bugReportErrorMessage` | Failed to submit bug report. Please try again. | ✅ |
+| Context header | `bugReportContextHeader` | Context (auto-collected) | ❌ |
+| Loading message | `bugReportLoadingMessage` | Gathering environment info… | ❌ |
+| **Feedback dialog** | | | |
+| Dialog title | `feedbackTitle` | Send Feedback | ✅ |
+| Rating label | `feedbackRatingLabel` | How would you rate this app? | ✅ |
+| Comment field label | `feedbackCommentLabel` | Comments | ✅ |
+| Comment placeholder | `feedbackCommentPlaceholder` | Share your thoughts about this app… | ✅ |
+| Submit button | `feedbackSubmit` | Submit Feedback | ✅ |
+| Cancel button | `feedbackCancel` | Cancel | ✅ |
+| Success toast | `feedbackSuccessMessage` | Feedback submitted successfully! | ✅ |
+| Error toast | `feedbackErrorMessage` | Failed to submit feedback. Please try again. | ✅ |
+| **Edit mode** | | | |
+| Edit-mode placeholder title | `editPlaceholderTitle` | HelpButton.qs | ❌ |
+| Edit-mode placeholder description | `editPlaceholderDescription` | Injects a help button into the toolbar. Configure menu items in the property panel. | ❌ |
+| Analysis-mode placeholder | `analysisPlaceholder` | Help button active in toolbar | ✅ |
 
 ---
 
@@ -142,7 +155,7 @@ flowchart TD
 
 | From → To | Effect |
 |---|---|
-| Auto-detect → Specific language | A confirmation prompt appears. If accepted, all translatable fields (button label, tooltip, popup title, bug-report dialog title) are **overwritten** with the standard translations for that language. You can then edit any of them. |
+| Auto-detect → Specific language | A confirmation prompt appears. If accepted, all translatable fields (button label, tooltip, popup title, bug-report dialog texts, and feedback dialog texts) are **overwritten** with the standard translations for that language. You can then edit any of them. |
 | Specific language → Auto-detect | A confirmation prompt appears. If accepted, all translatable fields are **cleared** (set to empty). This means the extension will auto-detect the language at runtime and use the built-in defaults. |
 | Specific language → Another language | Same as the first case — fields are overwritten with the new language's defaults. |
 
@@ -167,13 +180,14 @@ flowchart TB
         GEL["getEffectiveLocale()"]
         GT["getTranslation()"]
         RT["resolveText()"]
-        TT["translations table (9 languages × 15 keys)"]
+        TT["translations table (9 languages × 23 keys)"]
     end
 
     subgraph "UI Components (Analysis Mode)"
         TB["Toolbar button"]
         PM["Popup menu"]
         BRD["Bug-report dialog"]
+        FD["Feedback dialog"]
     end
 
     LP -- "language property" --> SFL
@@ -187,6 +201,7 @@ flowchart TB
     RT -- "resolved string" --> TB
     RT -- "resolved string" --> PM
     RT -- "resolved string" --> BRD
+    RT -- "resolved string" --> FD
 ```
 
 ---
@@ -216,6 +231,21 @@ Select a language to pre-fill the defaults, then edit specific fields. For examp
 Leave the dropdown on **Auto-detect** but type a custom value in one or more text fields. The custom values are used as-is (for all users, in all languages), while the remaining empty fields continue to auto-translate.
 
 > **Note:** Custom text values are language-agnostic — they are shown to all users regardless of locale. If you need different custom text per language, use Scenario 2 or Scenario 3 instead.
+
+### Scenario 5 — Feedback dialog with auto-translated strings
+
+The feedback dialog (available when a menu item's action is set to **Open Feedback dialog**) participates fully in the translation system. All 8 feedback dialog strings — title, rating label, comment label, comment placeholder, submit button, cancel button, success message, and error message — have built-in translations for all 9 languages.
+
+The same rules apply as for the bug-report dialog: leave the property-panel fields empty and the extension fills in the correct translation at runtime. Type a custom value and it is used as-is.
+
+For example, a Finnish user (`fi`) who opens the feedback dialog with all fields left empty will see:
+
+| Field | Finnish default |
+|---|---|
+| Dialog title | Lähetä palautetta |
+| Rating label | Miten arvioisit tämän sovelluksen? |
+| Submit button | Lähetä palaute |
+| Cancel button | Peruuta |
 
 ---
 
