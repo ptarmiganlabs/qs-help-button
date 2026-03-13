@@ -134,10 +134,11 @@ User selects preset
 
 User adds a new tooltip (after preset was applied)
     → Qlik property panel creates item with hardcoded defaultValue colors
-    → change handler on tooltips array fires
-        → applyPresetToNewTooltips(data)
-            → detects items where _themedPreset !== current preset
+    → Supernova re-renders with updated layout
+    → useEffect in index.js detects items where _themedPreset !== current preset
+        → model.getProperties() → applyPresetToNewTooltips(props) → model.setProperties(props)
             → writes active preset colors + stamps _themedPreset
+            → persisted via engine API
 
 Extension renders in analysis mode
     → injectTooltips(layout, adapter, platform)
@@ -150,7 +151,7 @@ Extension renders in analysis mode
 
 ### applyPresetToNewTooltips()
 
-Exported from `presets.js`, this function is called from the tooltips array `change` handler in `ext.js`. It iterates all tooltip items and applies the active preset's `tooltipDefaults` to any item that hasn't been themed yet (where `item._themedPreset !== data.themePreset`). This ensures newly added tooltips inherit the active theme's colors.
+Exported from `presets.js`, this function is called from a `useEffect` in `index.js` that watches the layout for unthemed tooltip items. When the Supernova re-renders (e.g. after a new tooltip is added), the effect detects items where `_themedPreset !== layout.themePreset`, fetches the live properties via `model.getProperties()`, applies the preset defaults, and persists via `model.setProperties()`. This ensures newly added tooltips inherit the active theme's colors.
 
 ### resolveColor()
 

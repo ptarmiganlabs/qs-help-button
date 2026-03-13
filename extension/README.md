@@ -101,8 +101,8 @@ flowchart TD
 
 ### Documentation
 
-- **App developers**: See [Tooltips — App Developer Guide](../docs/tooltips-app-developer.md) for a complete walkthrough of configuring tooltips from the property panel, including how to find CSS selectors using browser DevTools.
-- **Extension developers**: See [Tooltips — Developer Guide](../docs/tooltips-developer.md) for the technical architecture, data model, theme system internals, and how to extend the feature.
+- **App developers**: See [Tooltips — App Developer Guide](docs/tooltips-app-developer.md) for a complete walkthrough of configuring tooltips from the property panel, including how to find CSS selectors using browser DevTools.
+- **Extension developers**: See [Tooltips — Developer Guide](docs/tooltips-developer.md) for the technical architecture, data model, theme system internals, and how to extend the feature.
 
 ## Bug Report Context Fields
 
