@@ -29,8 +29,8 @@ export function markdownToHtml(md) {
     // Normalize line endings
     let text = md.replace(/\r\n?/g, '\n');
 
-    // Escape HTML entities (but preserve already-written HTML tags for power users)
-    text = text.replace(/&(?!#?\w+;)/g, '&amp;').replace(/<(?![/a-zA-Z!])/g, '&lt;');
+    // Escape ALL HTML to prevent XSS — Markdown rules below produce their own safe tags
+    text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
     // Horizontal rules
     text = text.replace(/^(?:[-*_]){3,}\s*$/gm, '<hr>');
@@ -67,15 +67,19 @@ export function markdownToHtml(md) {
 
     // Images: ![alt](src "title")
     text = text.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (_, alt, src, title) => {
-        const titleAttr = title ? ` title="${title}"` : '';
-        return `<img src="${src}" alt="${alt}"${titleAttr} style="max-width:100%;height:auto;" />`;
+        if (!/^https?:\/\//i.test(src)) return '';
+        const safeAlt = alt.replace(/"/g, '&quot;');
+        const safeSrc = src.replace(/"/g, '&quot;');
+        const titleAttr = title ? ` title="${title.replace(/"/g, '&quot;')}"` : '';
+        return `<img src="${safeSrc}" alt="${safeAlt}"${titleAttr} style="max-width:100%;height:auto;" />`;
     });
 
     // Links: [text](url)
-    text = text.replace(
-        /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener">$1</a>'
-    );
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, linkText, url) => {
+        if (!/^https?:\/\/|^mailto:/i.test(url)) return linkText;
+        const safeUrl = url.replace(/"/g, '&quot;');
+        return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+    });
 
     // Inline code
     text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -102,6 +106,10 @@ export function markdownToHtml(md) {
 
     // Wrap in paragraph tags
     text = `<p>${text}</p>`;
+
+    // Strip <p> wrappers around block-level elements (invalid nesting)
+    text = text.replace(/<p>\s*(<(?:ul|ol|blockquote|h[3-6]|hr)[\s>])/g, '$1');
+    text = text.replace(/(<\/(?:ul|ol|blockquote|h[3-6])>|<hr>)\s*<\/p>/g, '$1');
 
     // Clean up empty paragraphs
     text = text.replace(/<p>\s*<\/p>/g, '');
