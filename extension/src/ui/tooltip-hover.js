@@ -37,7 +37,7 @@ export function showHover(iconEl, content, colors) {
     if (!content) return;
 
     const popup = document.createElement('div');
-    popup.className = 'hbqs-tooltip-hover';
+    popup.className = 'hbqs-tooltip-hover hbqs-markdown-content';
     popup.dataset.hbqsFor = iconEl.id;
     popup.innerHTML = markdownToHtml(content);
 
