@@ -32,6 +32,7 @@ flowchart TD
 * A native Qlik Sense extension built using modern Nebula.js hooks.
 * Works on **both Qlik Sense SaaS (Cloud)** and **Client-Managed Qlik Sense (Enterprise)**.
 * Easily configured by developers from within the Qlik Sense Property Panel (custom colors, icons, menus).
+* Supports three menu item types: **outbound links**, **bug report dialogs**, and **user feedback dialogs** (with star rating and free-text comments).
 * To use, simply drop the extension on a sheet, and it will dynamically inject the button into the global toolbar when the user switches to Analysis mode.
 
 ### 2. HTML Injection (Client-Managed only)
@@ -79,11 +80,20 @@ Both methods support localized interfaces so you can provide menus built for you
 
 > **A note on folder names (HTML Variants):** Language folders are named using [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) **language** codes, not [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) **country** codes. For example, Danish is `da` (not `dk`), Swedish is `sv` (not `se`), and German is `de` (not the country-code for Germany, which is also `de` by coincidence).
 
-### Demo Server (Bug Report Webhook)
+### Demo Server (Bug Report & Feedback Webhook)
 
-Both the extension and the HTML Bug Report variant can submit reports to a configurable webhook endpoint. A ready-to-use **Express.js demo server** is included for local testing and development — see the [Demo Server documentation](./shared/demo-server/README.md).
+Both the extension and the HTML Bug Report variant can submit reports to a configurable webhook endpoint. The extension's Feedback dialog also POSTs data to a webhook. A ready-to-use **Express.js demo server** is included for local testing and development — see the [Demo Server documentation](./shared/demo-server/README.md).
 
-The demo server supports both HTTP and HTTPS, logs incoming bug reports to the console, and includes step-by-step instructions for generating self-signed certificates (required when testing with Qlik Sense Enterprise on Windows).
+The demo server supports both HTTP and HTTPS, logs incoming bug reports and feedback to the console, and includes step-by-step instructions for generating self-signed certificates (required when testing with Qlik Sense Enterprise on Windows).
+
+```mermaid
+flowchart LR
+    subgraph Qlik Sense
+        A[Bug Report Dialog] -->|POST /api/bug-reports| C[Demo Server]
+        B[Feedback Dialog] -->|POST /api/feedback| C
+    end
+    C --> D[Console Log]
+```
 
 ## License
 

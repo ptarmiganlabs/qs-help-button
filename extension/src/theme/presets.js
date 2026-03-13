@@ -54,6 +54,13 @@ export const defaultPreset = {
       textColor: toPickerObj("#78350f"),
       icon: "bug",
     },
+    feedback: {
+      iconColor: toPickerObj("#7c3aed"),
+      bgColor: toPickerObj("#f5f3ff"),
+      bgColorHover: toPickerObj("#ede9fe"),
+      textColor: toPickerObj("#4c1d95"),
+      icon: "star",
+    },
   },
 };
 
@@ -95,6 +102,13 @@ export const leanGreenPreset = {
       bgColorHover: toPickerObj("#fef3c7"),
       textColor: toPickerObj("#78350f"),
       icon: "bug",
+    },
+    feedback: {
+      iconColor: toPickerObj("#0891b2"),
+      bgColor: toPickerObj("#ecfeff"),
+      bgColorHover: toPickerObj("#cffafe"),
+      textColor: toPickerObj("#164e63"),
+      icon: "star",
     },
   },
 };
@@ -138,6 +152,13 @@ export const corporateBluePreset = {
       textColor: toPickerObj("#7f1d1d"),
       icon: "bug",
     },
+    feedback: {
+      iconColor: toPickerObj("#7c3aed"),
+      bgColor: toPickerObj("#f5f3ff"),
+      bgColorHover: toPickerObj("#ede9fe"),
+      textColor: toPickerObj("#4c1d95"),
+      icon: "star",
+    },
   },
 };
 
@@ -179,6 +200,13 @@ export const corporateGoldPreset = {
       bgColorHover: toPickerObj("#dbeafe"),
       textColor: toPickerObj("#1e3a5f"),
       icon: "bug",
+    },
+    feedback: {
+      iconColor: toPickerObj("#7c3aed"),
+      bgColor: toPickerObj("#faf5ff"),
+      bgColorHover: toPickerObj("#f3e8ff"),
+      textColor: toPickerObj("#581c87"),
+      icon: "star",
     },
   },
 };
@@ -226,7 +254,9 @@ export function applyPreset(data, presetKey) {
   if (data.menuItems && Array.isArray(data.menuItems)) {
     const typeStyles = preset.menuItemTypeStyles;
     data.menuItems = data.menuItems.map(item => {
-      const styleKey = item.action === 'bugReport' ? 'bugReport' : 'url';
+      let styleKey = 'url';
+      if (item.action === 'bugReport') styleKey = 'bugReport';
+      else if (item.action === 'feedback') styleKey = 'feedback';
       const style = (typeStyles && typeStyles[styleKey]) || preset.menuItemDefaults;
       const updates = {
         ...item,
@@ -235,8 +265,8 @@ export function applyPreset(data, presetKey) {
         bgColorHover: style.bgColorHover,
         textColor: style.textColor,
       };
-      // Set icon for bug-report items; preserve user-chosen icon for URL items
-      if (item.action === 'bugReport' && style.icon) {
+      // Set icon for bug-report and feedback items; preserve user-chosen icon for URL items
+      if ((item.action === 'bugReport' || item.action === 'feedback') && style.icon) {
         updates.icon = style.icon;
       }
       return updates;

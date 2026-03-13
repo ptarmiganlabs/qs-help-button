@@ -1,6 +1,6 @@
 # HelpButton.qs Demo Server
 
-A minimal Node.js backend that receives bug reports from **HelpButton.qs** — both the **Qlik Sense extension** and the **HTML injection Bug Report variant** — and logs them to the console. Built with [Express](https://expressjs.com) and [Winston](https://github.com/winstonjs/winston).
+A minimal Node.js backend that receives bug reports and user feedback from **HelpButton.qs** — both the **Qlik Sense extension** and the **HTML injection Bug Report variant** — and logs them to the console. Built with [Express](https://expressjs.com) and [Winston](https://github.com/winstonjs/winston).
 
 > **Location:** This server lives in `shared/demo-server/` at the repository root and is shared across all HelpButton.qs delivery methods.
 
@@ -370,6 +370,31 @@ Expected response:
 
 ```json
 { "status": "ok", "message": "Bug report received", "id": "br-1739530200000" }
+```
+
+### Submit feedback
+
+```bash
+# HTTPS mode
+curl -k -X POST https://localhost:3443/api/feedback \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "timestamp": "2026-03-08T12:00:00.000Z",
+    "context": {
+      "userName": "Göran Sander",
+      "appId": "4634fbc8-65eb-4aff-a686-34e75326e534",
+      "sheetId": "tAyTET",
+      "platform": "client-managed"
+    },
+    "rating": 4,
+    "comment": "Great dashboards, very useful!"
+  }'
+```
+
+Expected response:
+
+```json
+{ "status": "ok", "message": "Feedback received", "id": "fb-1739530200000" }
 ```
 
 ---

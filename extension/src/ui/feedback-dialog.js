@@ -1,11 +1,13 @@
 /**
- * Bug-report dialog component for HelpButton.qs.
+ * Feedback dialog component for HelpButton.qs.
  *
- * Modal overlay with a form that collects bug-report data and
- * submits it to a configurable webhook URL.  Context data (user info,
- * Qlik Sense version, app/sheet IDs) is gathered asynchronously and
- * displayed as read-only form fields — matching the HTML injection
- * variant's polished look.
+ * Modal overlay with a form that collects user feedback (optional star
+ * rating and optional free-text comment) and submits it to a configurable
+ * webhook URL.  Context data (user info, app/sheet IDs) is gathered
+ * asynchronously and included in the payload.
+ *
+ * Styled consistently with the bug-report dialog — reuses the same
+ * CSS class prefix (`hbqs-bug-report-*`) for visual consistency.
  */
 
 import { makeSvg } from './icons';
@@ -15,7 +17,6 @@ import logger from '../util/logger';
 
 // ---------------------------------------------------------------------------
 // Field labels — maps internal field keys to user-visible labels.
-// Matches the HTML variant's FIELD_LABELS dictionary.
 // ---------------------------------------------------------------------------
 const DEFAULT_FIELD_LABELS = {
     userId: 'User ID',
@@ -35,14 +36,6 @@ const DEFAULT_FIELD_LABELS = {
     roles: 'Roles',
 };
 
-// Fields that should render side-by-side in a paired row.
-// Key = first field, value = second field.
-const PAIRED_FIELDS = {
-    userName: 'platform',
-    appId: 'sheetId',
-    userDirectory: 'userId',
-};
-
 // Canonical display order for context fields.
 const FIELD_ORDER = [
     'userName', 'platform', 'appId', 'sheetId', 'urlPath', 'timestamp',
@@ -50,27 +43,38 @@ const FIELD_ORDER = [
     'tenantId', 'status', 'picture', 'preferredZoneinfo', 'roles',
 ];
 
+// Pairs of fields that should render side-by-side in a single row.
+// Each entry maps left → right.  When the left field is rendered the right
+// field is pulled alongside it (if both are enabled).
+const PAIRED_FIELDS = {
+    userName: 'platform',
+    appId: 'sheetId',
+    userDirectory: 'userId',
+};
+
 /**
- * @typedef {object} BugReportConfig
- * @property {string} webhookUrl - URL to POST bug reports to.
+ * @typedef {object} FeedbackConfig
+ * @property {string} webhookUrl - URL to POST feedback to.
  * @property {string} [authStrategy] - Auth strategy: 'none', 'header', 'sense-session', 'custom'.
  * @property {string} [authToken] - Bearer token (for 'header' strategy).
  * @property {string} [authHeaderName] - Custom header name (for 'header' strategy).
  * @property {string} [authHeaderValue] - Custom header value (for 'header' strategy).
  * @property {object} [customHeaders] - Additional headers (for 'custom' strategy).
- * @property {string[]} [collectFields] - Context fields to collect and display.
+ * @property {boolean} [enableRating] - Whether to show the 1-5 star rating.
+ * @property {boolean} [enableComment] - Whether to show the free-text comment field.
+ * @property {number} [commentMaxLength] - Max characters for the comment field.
+ * @property {string[]} [collectFields] - Context fields to collect.
  * @property {object} [dialogStrings] - Overrides for dialog text strings.
- * @property {object} [popupStyle] - Style properties for the dialog.
  */
 
 /**
- * Open the bug-report dialog.
+ * Open the feedback dialog.
  *
- * @param {BugReportConfig} config - Bug report configuration from layout.
+ * @param {FeedbackConfig} config - Feedback configuration from layout.
  * @param {'client-managed' | 'cloud'} platformType - Current platform.
  * @returns {void}
  */
-export function openBugReportDialog(config, platformType) {
+export function openFeedbackDialog(config, platformType) {
     const {
         webhookUrl = '',
         authStrategy = 'none',
@@ -78,8 +82,9 @@ export function openBugReportDialog(config, platformType) {
         authHeaderName = 'Authorization',
         authHeaderValue = '',
         customHeaders = {},
-        enableSeverity = true,
-        descriptionMaxLength = 1000,
+        enableRating = true,
+        enableComment = true,
+        commentMaxLength = 500,
         dialogStrings = {},
     } = config;
 
@@ -92,7 +97,9 @@ export function openBugReportDialog(config, platformType) {
     const defaultOnFields = ['userName', 'appId', 'sheetId', 'urlPath', 'platform', 'timestamp'];
 
     // Helper: resolve a field-toggle object where missing keys fall back to
-    // their default values (handles instances saved before toggles existed).
+    // their default values. This handles existing extension instances that were
+    // saved before these toggle properties were added — the property panel
+    // displays defaultValue but the stored data may not contain the key yet.
     function resolveFieldToggle(obj) {
         return FIELD_ORDER.filter((f) => {
             if (f in obj) return obj[f];
@@ -121,25 +128,25 @@ export function openBugReportDialog(config, platformType) {
     const allFields = [...new Set([...dialogFields, ...payloadFields])];
 
     // Remove any existing dialog
-    const existing = document.getElementById('hbqs-bug-report-overlay');
+    const existing = document.getElementById('hbqs-feedback-overlay');
     if (existing) existing.remove();
 
     // Localized strings
-    const title = resolveText(dialogStrings.title, 'bugReportTitle');
-    const descriptionLabel = resolveText(dialogStrings.descriptionLabel, 'bugReportDescriptionLabel');
-    const descriptionPlaceholder = resolveText(
-        dialogStrings.descriptionPlaceholder,
-        'bugReportDescriptionPlaceholder'
+    const title = resolveText(dialogStrings.title, 'feedbackTitle');
+    const ratingLabel = resolveText(dialogStrings.ratingLabel, 'feedbackRatingLabel');
+    const commentLabel = resolveText(dialogStrings.commentLabel, 'feedbackCommentLabel');
+    const commentPlaceholder = resolveText(
+        dialogStrings.commentPlaceholder,
+        'feedbackCommentPlaceholder'
     );
-    const submitText = resolveText(dialogStrings.submitButton, 'bugReportSubmit');
-    const cancelText = resolveText(dialogStrings.cancelButton, 'bugReportCancel');
-    const successMsg = resolveText(dialogStrings.successMessage, 'bugReportSuccessMessage');
-    const errorMsg = resolveText(dialogStrings.errorMessage, 'bugReportErrorMessage');
-    const loadingText = resolveText(dialogStrings.loadingMessage, 'bugReportLoadingMessage');
+    const submitText = resolveText(dialogStrings.submitButton, 'feedbackSubmit');
+    const cancelText = resolveText(dialogStrings.cancelButton, 'feedbackCancel');
+    const successMsg = resolveText(dialogStrings.successMessage, 'feedbackSuccessMessage');
+    const errorMsg = resolveText(dialogStrings.errorMessage, 'feedbackErrorMessage');
 
     // -- Build dialog DOM --
     const overlay = document.createElement('div');
-    overlay.id = 'hbqs-bug-report-overlay';
+    overlay.id = 'hbqs-feedback-overlay';
     overlay.className = 'hbqs-bug-report-overlay';
 
     const dialog = document.createElement('div');
@@ -167,25 +174,17 @@ export function openBugReportDialog(config, platformType) {
 
     dialog.appendChild(headerEl);
 
-    // Toast area (hidden initially — used for success/error messages inside the dialog)
+    // Toast area
     const toastArea = document.createElement('div');
     toastArea.className = 'hbqs-bug-report-toast';
     dialog.appendChild(toastArea);
 
-    // Body — initially shows a loading spinner
+    // Body
     const body = document.createElement('div');
     body.className = 'hbqs-bug-report-body';
-
-    const loadingEl = document.createElement('div');
-    loadingEl.className = 'hbqs-bug-report-loading';
-    loadingEl.innerHTML =
-        '<div class="hbqs-spinner hbqs-spinner-context"></div>' +
-        '<span>' + escapeHtml(loadingText) + '</span>';
-    body.appendChild(loadingEl);
-
     dialog.appendChild(body);
 
-    // Footer (hidden until context loads)
+    // Footer (hidden until ready)
     const footer = document.createElement('div');
     footer.className = 'hbqs-bug-report-actions';
     footer.style.display = 'none';
@@ -207,17 +206,13 @@ export function openBugReportDialog(config, platformType) {
     dialog.focus();
 
     // Track form state
-    let selectedSeverity = null; // 'low' | 'medium' | 'high' | null
-    let descriptionTextarea = null;
+    let selectedRating = 0;
+    let commentTextarea = null;
 
-    // -- Gather context asynchronously, then build the form --
+    // Build the form once context is gathered
     gatherContextData(allFields, platformType).then((context) => {
-        logger.debug('Context gathered:', JSON.stringify(context, null, 2));
-
-        // Remove loading indicator
-        body.removeChild(loadingEl);
-
-        // --- Context fields (read-only inputs) ---
+        // --- Context fields (read-only) ---
+        // Track fields already rendered as the right side of a pair.
         const rendered = new Set();
 
         for (const field of dialogFields) {
@@ -248,106 +243,98 @@ export function openBugReportDialog(config, platformType) {
             rendered.add(field);
         }
 
-        // --- Severity picker ---
-        if (enableSeverity) {
-            const severityGroup = document.createElement('div');
-            severityGroup.className = 'hbqs-bug-report-field-group';
+        // --- Star rating ---
+        if (enableRating) {
+            const ratingGroup = document.createElement('div');
+            ratingGroup.className = 'hbqs-bug-report-field-group';
 
-            const severityLabel = document.createElement('label');
-            severityLabel.className = 'hbqs-bug-report-label';
-            severityLabel.textContent = resolveText(dialogStrings.severityLabel, 'bugReportSeverityLabel') || 'Severity';
-            severityGroup.appendChild(severityLabel);
+            const ratingLabelEl = document.createElement('label');
+            ratingLabelEl.className = 'hbqs-bug-report-label';
+            ratingLabelEl.textContent = ratingLabel;
+            ratingGroup.appendChild(ratingLabelEl);
 
-            const severityBar = document.createElement('div');
-            severityBar.className = 'hbqs-severity-bar';
-            severityBar.setAttribute('role', 'radiogroup');
-            severityBar.setAttribute('aria-label', resolveText(dialogStrings.severityLabel, 'bugReportSeverityLabel') || 'Severity');
+            const starsContainer = document.createElement('div');
+            starsContainer.className = 'hbqs-feedback-stars';
+            starsContainer.setAttribute('role', 'radiogroup');
+            starsContainer.setAttribute('aria-label', ratingLabel);
 
-            const SEVERITY_OPTIONS = [
-                { value: 'low',    label: resolveText(dialogStrings.severityLowLabel, 'bugReportSeverityLowLabel') || 'Low',    color: '#22c55e' },
-                { value: 'medium', label: resolveText(dialogStrings.severityMediumLabel, 'bugReportSeverityMediumLabel') || 'Medium', color: '#eab308' },
-                { value: 'high',   label: resolveText(dialogStrings.severityHighLabel, 'bugReportSeverityHighLabel') || 'High',   color: '#ef4444' },
-            ];
+            for (let i = 1; i <= 5; i++) {
+                const starBtn = document.createElement('button');
+                starBtn.type = 'button';
+                starBtn.className = 'hbqs-feedback-star';
+                starBtn.dataset.value = String(i);
+                starBtn.setAttribute('role', 'radio');
+                starBtn.setAttribute('aria-checked', 'false');
+                starBtn.setAttribute('aria-label', i + ' star' + (i > 1 ? 's' : ''));
+                starBtn.innerHTML = makeSvg('star', 28, '#d1d5db');
 
-            for (const opt of SEVERITY_OPTIONS) {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'hbqs-severity-btn';
-                btn.dataset.severity = opt.value;
-                btn.setAttribute('role', 'radio');
-                btn.setAttribute('aria-checked', 'false');
-                btn.setAttribute('aria-label', opt.label);
-
-                // Colored circle SVG
-                const circle = `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">` +
-                    `<circle cx="7" cy="7" r="6" fill="${opt.color}" stroke="${opt.color}" stroke-width="1"/>` +
-                    `</svg>`;
-
-                btn.innerHTML = circle + '<span>' + escapeHtml(opt.label) + '</span>';
-
-                btn.addEventListener('click', () => {
-                    selectedSeverity = opt.value;
-                    // Update all buttons
-                    for (const b of severityBar.querySelectorAll('.hbqs-severity-btn')) {
-                        const isActive = b.dataset.severity === opt.value;
-                        b.classList.toggle('hbqs-severity-btn-active', isActive);
-                        b.setAttribute('aria-checked', isActive ? 'true' : 'false');
-                    }
+                starBtn.addEventListener('click', () => {
+                    selectedRating = i;
+                    updateStars(starsContainer, i);
                     updateSubmitState();
                 });
 
-                severityBar.appendChild(btn);
+                starBtn.addEventListener('mouseenter', () => {
+                    highlightStars(starsContainer, i);
+                });
+
+                starsContainer.appendChild(starBtn);
             }
 
-            severityGroup.appendChild(severityBar);
-            body.appendChild(severityGroup);
-        }
-
-        // --- Description textarea ---
-        const descGroup = document.createElement('div');
-        descGroup.className = 'hbqs-bug-report-field-group';
-
-        const label = document.createElement('label');
-        label.className = 'hbqs-bug-report-label';
-        label.textContent = descriptionLabel;
-        label.htmlFor = 'hbqs-bug-report-description';
-        descGroup.appendChild(label);
-
-        descriptionTextarea = document.createElement('textarea');
-        descriptionTextarea.id = 'hbqs-bug-report-description';
-        descriptionTextarea.className = 'hbqs-bug-report-textarea';
-        descriptionTextarea.placeholder = descriptionPlaceholder;
-        descriptionTextarea.rows = 4;
-        if (descriptionMaxLength > 0) {
-            descriptionTextarea.maxLength = descriptionMaxLength;
-        }
-        descGroup.appendChild(descriptionTextarea);
-
-        // Character counter
-        if (descriptionMaxLength > 0) {
-            const counter = document.createElement('div');
-            counter.className = 'hbqs-feedback-char-counter';
-            counter.textContent = descriptionMaxLength + ' / ' + descriptionMaxLength;
-
-            descriptionTextarea.addEventListener('input', () => {
-                const remaining = descriptionMaxLength - descriptionTextarea.value.length;
-                counter.textContent = remaining + ' / ' + descriptionMaxLength;
-                if (remaining < 0) {
-                    counter.classList.add('hbqs-feedback-char-counter-exceeded');
-                } else {
-                    counter.classList.remove('hbqs-feedback-char-counter-exceeded');
-                }
-                updateSubmitState();
+            starsContainer.addEventListener('mouseleave', () => {
+                updateStars(starsContainer, selectedRating);
             });
 
-            descGroup.appendChild(counter);
-        } else {
-            descriptionTextarea.addEventListener('input', () => {
-                updateSubmitState();
-            });
+            ratingGroup.appendChild(starsContainer);
+            body.appendChild(ratingGroup);
         }
 
-        body.appendChild(descGroup);
+        // --- Comment textarea ---
+        if (enableComment) {
+            const commentGroup = document.createElement('div');
+            commentGroup.className = 'hbqs-bug-report-field-group';
+
+            const commentLabelEl = document.createElement('label');
+            commentLabelEl.className = 'hbqs-bug-report-label';
+            commentLabelEl.textContent = commentLabel;
+            commentLabelEl.htmlFor = 'hbqs-feedback-comment';
+            commentGroup.appendChild(commentLabelEl);
+
+            commentTextarea = document.createElement('textarea');
+            commentTextarea.id = 'hbqs-feedback-comment';
+            commentTextarea.className = 'hbqs-bug-report-textarea';
+            commentTextarea.placeholder = commentPlaceholder;
+            commentTextarea.rows = 4;
+            if (commentMaxLength > 0) {
+                commentTextarea.maxLength = commentMaxLength;
+            }
+            commentGroup.appendChild(commentTextarea);
+
+            // Character counter
+            if (commentMaxLength > 0) {
+                const counter = document.createElement('div');
+                counter.className = 'hbqs-feedback-char-counter';
+                counter.textContent = commentMaxLength + ' / ' + commentMaxLength;
+                commentGroup.appendChild(counter);
+
+                commentTextarea.addEventListener('input', () => {
+                    const remaining = commentMaxLength - commentTextarea.value.length;
+                    counter.textContent = remaining + ' / ' + commentMaxLength;
+                    if (remaining < 0) {
+                        counter.classList.add('hbqs-feedback-char-counter-exceeded');
+                    } else {
+                        counter.classList.remove('hbqs-feedback-char-counter-exceeded');
+                    }
+                    updateSubmitState();
+                });
+            } else {
+                commentTextarea.addEventListener('input', () => {
+                    updateSubmitState();
+                });
+            }
+
+            body.appendChild(commentGroup);
+        }
 
         // --- Footer buttons ---
         footer.style.display = 'flex';
@@ -369,11 +356,16 @@ export function openBugReportDialog(config, platformType) {
         submitBtn.classList.add('hbqs-bug-report-btn-submit-disabled');
         footer.appendChild(submitBtn);
 
-        // Enable/disable submit — description text is required
+        // Enable/disable submit based on form state
         function updateSubmitState() {
-            const hasText = descriptionTextarea && descriptionTextarea.value.trim().length > 0;
-            submitBtn.disabled = !hasText;
-            if (hasText) {
+            const hasRating = enableRating && selectedRating > 0;
+            const hasComment = enableComment && commentTextarea &&
+                commentTextarea.value.trim().length > 0;
+            const hasAnyInput = hasRating || hasComment;
+
+            // At least one input must be provided
+            submitBtn.disabled = !hasAnyInput;
+            if (hasAnyInput) {
                 submitBtn.classList.remove('hbqs-bug-report-btn-submit-disabled');
             } else {
                 submitBtn.classList.add('hbqs-bug-report-btn-submit-disabled');
@@ -399,11 +391,13 @@ export function openBugReportDialog(config, platformType) {
                 const payload = {
                     timestamp: new Date().toISOString(),
                     context: payloadContext,
-                    description: descriptionTextarea.value.trim(),
                 };
 
-                if (enableSeverity && selectedSeverity) {
-                    payload.severity = selectedSeverity;
+                if (enableRating) {
+                    payload.rating = selectedRating;
+                }
+                if (enableComment && commentTextarea) {
+                    payload.comment = commentTextarea.value.trim();
                 }
 
                 const headers = buildAuthHeaders(authStrategy, {
@@ -422,15 +416,14 @@ export function openBugReportDialog(config, platformType) {
                     body: JSON.stringify(payload),
                 });
 
-                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
 
                 showDialogToast(toastArea, successMsg, 'success');
-                logger.info('Bug report submitted successfully');
+                logger.info('Feedback submitted successfully');
 
-                // Auto-close after a brief delay
                 setTimeout(() => closeDialog(), 1500);
             } catch (err) {
-                logger.error('Bug report submission failed:', err);
+                logger.error('Feedback submission failed:', err);
                 showDialogToast(toastArea, errorMsg, 'error');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML =
@@ -439,15 +432,58 @@ export function openBugReportDialog(config, platformType) {
             }
         });
 
-        // Focus the textarea once the form is built
-        requestAnimationFrame(() => descriptionTextarea.focus());
+        // Focus the first interactive element
+        requestAnimationFrame(() => {
+            if (enableRating) {
+                const firstStar = body.querySelector('.hbqs-feedback-star');
+                if (firstStar) firstStar.focus();
+            } else if (commentTextarea) {
+                commentTextarea.focus();
+            }
+        });
     });
 
     function closeDialog() {
         overlay.remove();
     }
 
-    logger.debug('Bug report dialog opened');
+    logger.debug('Feedback dialog opened');
+}
+
+// ---------------------------------------------------------------------------
+// Star rating helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Update the visual state of star buttons to reflect the selected rating.
+ *
+ * @param {HTMLElement} container - Stars container element.
+ * @param {number} rating - Selected rating (1-5, or 0 for none).
+ */
+function updateStars(container, rating) {
+    const stars = container.querySelectorAll('.hbqs-feedback-star');
+    stars.forEach((star) => {
+        const val = parseInt(star.dataset.value, 10);
+        const active = val <= rating;
+        star.setAttribute('aria-checked', active ? 'true' : 'false');
+        star.classList.toggle('hbqs-feedback-star-active', active);
+        star.innerHTML = makeSvg('star', 28, active ? '#f59e0b' : '#d1d5db');
+    });
+}
+
+/**
+ * Highlight stars on hover (preview state).
+ *
+ * @param {HTMLElement} container - Stars container element.
+ * @param {number} hoverRating - The star being hovered (1-5).
+ */
+function highlightStars(container, hoverRating) {
+    const stars = container.querySelectorAll('.hbqs-feedback-star');
+    stars.forEach((star) => {
+        const val = parseInt(star.dataset.value, 10);
+        const highlighted = val <= hoverRating;
+        star.innerHTML = makeSvg('star', 28, highlighted ? '#fbbf24' : '#d1d5db');
+    });
 }
 
 // ---------------------------------------------------------------------------
@@ -472,7 +508,7 @@ function makeReadonlyField(fieldKey, value) {
     const input = document.createElement('input');
     input.type = 'text';
     input.readOnly = true;
-    input.value = value || '—';
+    input.value = value || '\u2014';
     input.className = 'hbqs-bug-report-readonly-input';
     input.tabIndex = -1;
 
@@ -486,7 +522,7 @@ function makeReadonlyField(fieldKey, value) {
 // ---------------------------------------------------------------------------
 
 /**
- * Show a toast message inside the dialog (between header and body).
+ * Show a toast message inside the dialog.
  *
  * @param {HTMLElement} toastArea - The toast container element.
  * @param {string} message - Message text.
@@ -494,26 +530,18 @@ function makeReadonlyField(fieldKey, value) {
  */
 function showDialogToast(toastArea, message, type) {
     toastArea.textContent = message;
-    toastArea.className = `hbqs-bug-report-toast hbqs-bug-report-toast-${type} hbqs-bug-report-toast-visible`;
+    toastArea.className = 'hbqs-bug-report-toast hbqs-bug-report-toast-' + type + ' hbqs-bug-report-toast-visible';
 }
 
 // ---------------------------------------------------------------------------
-// Async context data gathering
+// Async context data gathering (same as bug-report-dialog.js)
 // ---------------------------------------------------------------------------
 
 /**
  * Fetch current user info.
  *
- * On **client-managed** Qlik Sense the proxy API is used:
- *   GET /qps/user?targetUri=<current URL>
- *
- * On **Qlik Cloud** the REST API is used:
- *   GET /api/v1/users/me
- *   — `email` is mapped to `userId`, `name` to `userName`.
- *   — `userDirectory` is not applicable and returns '(N/A)'.
- *
  * @param {'client-managed' | 'cloud'} platformType - Current platform.
- * @returns {Promise<{userId: string, userDirectory: string, userName: string}>}
+ * @returns {Promise<object>}
  */
 function getUserInfo(platformType) {
     if (platformType === 'cloud') {
@@ -537,19 +565,13 @@ function getUserInfo(platformType) {
             .catch((err) => {
                 logger.warn('Failed to fetch Cloud user info:', err);
                 return {
-                    userId: '(unknown)',
-                    userDirectory: '(N/A)',
-                    userName: '(unknown)',
-                    tenantId: '(unknown)',
-                    status: '(unknown)',
-                    picture: '(unknown)',
-                    preferredZoneinfo: '(unknown)',
-                    roles: '(unknown)',
+                    userId: '(unknown)', userDirectory: '(N/A)', userName: '(unknown)',
+                    tenantId: '(unknown)', status: '(unknown)', picture: '(unknown)',
+                    preferredZoneinfo: '(unknown)', roles: '(unknown)',
                 };
             });
     }
 
-    // Client-managed: use the proxy API
     return fetch('/qps/user?targetUri=' + encodeURIComponent(window.location.href))
         .then((resp) => {
             if (!resp.ok) throw new Error('User info request failed: ' + resp.status);
@@ -559,30 +581,21 @@ function getUserInfo(platformType) {
             userId: data.userId || '(unknown)',
             userDirectory: data.userDirectory || '(unknown)',
             userName: data.userName || '(unknown)',
-            tenantId: '(N/A)',
-            status: '(N/A)',
-            picture: '(N/A)',
-            preferredZoneinfo: '(N/A)',
-            roles: '(N/A)',
+            tenantId: '(N/A)', status: '(N/A)', picture: '(N/A)',
+            preferredZoneinfo: '(N/A)', roles: '(N/A)',
         }))
         .catch((err) => {
             logger.warn('Failed to fetch user info:', err);
             return {
-                userId: '(unavailable)',
-                userDirectory: '(unavailable)',
-                userName: '(unavailable)',
-                tenantId: '(N/A)',
-                status: '(N/A)',
-                picture: '(N/A)',
-                preferredZoneinfo: '(N/A)',
-                roles: '(N/A)',
+                userId: '(unavailable)', userDirectory: '(unavailable)', userName: '(unavailable)',
+                tenantId: '(N/A)', status: '(N/A)', picture: '(N/A)',
+                preferredZoneinfo: '(N/A)', roles: '(N/A)',
             };
         });
 }
 
 /**
- * Fetch Qlik Sense version from product-info.js (client-managed only).
- * GET /resources/autogenerated/product-info.js — parse the AMD module.
+ * Fetch Qlik Sense version (client-managed only).
  *
  * @returns {Promise<string>}
  */
@@ -593,7 +606,6 @@ function getSenseVersion() {
             return resp.text();
         })
         .then((text) => {
-            // AMD module: define([], /** ... */ { ... });
             const json = text
                 .replace(/^define\(\[],\s*\/\*\*.*?\*\/\s*/s, '')
                 .replace(/\s*\);?\s*$/, '');
@@ -609,7 +621,6 @@ function getSenseVersion() {
 
 /**
  * Gather all context data asynchronously.
- * Returns a Promise that resolves to an object keyed by field name.
  *
  * @param {string[]} fields - Field names to collect.
  * @param {'client-managed' | 'cloud'} platformType - Current platform.
@@ -620,7 +631,6 @@ function gatherContextData(fields, platformType) {
     const appMatch = path.match(/\/app\/([0-9a-f-]{36})/i);
     const sheetMatch = path.match(/\/sheet\/([^/]+)/);
 
-    // Determine which async fetches we need
     const needUser =
         fields.includes('userId') ||
         fields.includes('userName') ||
@@ -640,60 +650,32 @@ function gatherContextData(fields, platformType) {
 
         for (const field of fields) {
             switch (field) {
-                case 'userId':
-                    context.userId = user.userId || '(unavailable)';
-                    break;
-                case 'userName':
-                    context.userName = user.userName || '(unavailable)';
-                    break;
-                case 'userDirectory':
-                    context.userDirectory = user.userDirectory || '(unavailable)';
-                    break;
-                case 'tenantId':
-                    context.tenantId = user.tenantId || '(unavailable)';
-                    break;
-                case 'status':
-                    context.status = user.status || '(unavailable)';
-                    break;
-                case 'picture':
-                    context.picture = user.picture || '(unavailable)';
-                    break;
-                case 'preferredZoneinfo':
-                    context.preferredZoneinfo = user.preferredZoneinfo || '(unavailable)';
-                    break;
-                case 'roles':
-                    context.roles = user.roles || '(unavailable)';
-                    break;
-                case 'senseVersion':
-                    context.senseVersion = platformType === 'cloud' ? '(N/A)' : (version || '(unavailable)');
-                    break;
-                case 'appId':
-                    context.appId = appMatch ? appMatch[1] : '(not in an app)';
-                    break;
-                case 'sheetId':
-                    context.sheetId = sheetMatch ? sheetMatch[1] : '(no sheet selected)';
-                    break;
-                case 'urlPath':
-                    context.urlPath = window.location.pathname + window.location.search;
-                    break;
-                case 'platform':
-                    context.platform = platformType;
-                    break;
-                case 'browser':
-                    context.browser = navigator.userAgent;
-                    break;
-                case 'timestamp':
-                    context.timestamp = new Date().toLocaleString();
-                    break;
-                default:
-                    logger.debug('Unknown collect field:', field);
-                    break;
+                case 'userId':       context.userId = user.userId || '(unavailable)'; break;
+                case 'userName':     context.userName = user.userName || '(unavailable)'; break;
+                case 'userDirectory': context.userDirectory = user.userDirectory || '(unavailable)'; break;
+                case 'tenantId':     context.tenantId = user.tenantId || '(unavailable)'; break;
+                case 'status':       context.status = user.status || '(unavailable)'; break;
+                case 'picture':      context.picture = user.picture || '(unavailable)'; break;
+                case 'preferredZoneinfo': context.preferredZoneinfo = user.preferredZoneinfo || '(unavailable)'; break;
+                case 'roles':        context.roles = user.roles || '(unavailable)'; break;
+                case 'senseVersion': context.senseVersion = platformType === 'cloud' ? '(N/A)' : (version || '(unavailable)'); break;
+                case 'appId':        context.appId = appMatch ? appMatch[1] : '(not in an app)'; break;
+                case 'sheetId':      context.sheetId = sheetMatch ? sheetMatch[1] : '(no sheet selected)'; break;
+                case 'urlPath':      context.urlPath = window.location.pathname + window.location.search; break;
+                case 'platform':     context.platform = platformType; break;
+                case 'browser':      context.browser = navigator.userAgent; break;
+                case 'timestamp':    context.timestamp = new Date().toLocaleString(); break;
+                default:             logger.debug('Unknown collect field:', field); break;
             }
         }
 
         return context;
     });
 }
+
+// ---------------------------------------------------------------------------
+// Auth headers (same logic as bug-report-dialog.js)
+// ---------------------------------------------------------------------------
 
 /**
  * Build authentication headers based on the configured strategy.
@@ -710,12 +692,11 @@ function buildAuthHeaders(strategy, options) {
             if (options.authHeaderName && options.authHeaderValue) {
                 headers[options.authHeaderName] = options.authHeaderValue;
             } else if (options.authToken) {
-                headers['Authorization'] = `Bearer ${options.authToken}`;
+                headers['Authorization'] = 'Bearer ' + options.authToken;
             }
             break;
 
         case 'sense-session': {
-            // XRF key for CSRF protection on CM Qlik Sense
             const xrfKey = generateXrfKey();
             headers['X-Qlik-Xrfkey'] = xrfKey;
             break;
@@ -736,7 +717,7 @@ function buildAuthHeaders(strategy, options) {
 }
 
 /**
- * Generate a 16-character XRF key for Qlik Sense CSRF protection.
+ * Generate a 16-character XRF key.
  *
  * @returns {string} 16-character alphanumeric string.
  */

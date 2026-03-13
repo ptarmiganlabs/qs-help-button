@@ -246,19 +246,23 @@ export default function supernova(galaxy) {
 function renderEditPlaceholder(element, layout) {
     const menuCount = (layout.menuItems || []).length;
     const hasBugReport = (layout.menuItems || []).some((item) => item.action === 'bugReport');
+    const hasFeedback = (layout.menuItems || []).some((item) => item.action === 'feedback');
 
     const statsText =
         `${menuCount} menu item${menuCount !== 1 ? 's' : ''}` +
-        (hasBugReport ? ' · Bug report: On' : '');
+        (hasBugReport ? ' · Bug report: On' : '') +
+        (hasFeedback ? ' · Feedback: On' : '');
+
+    const placeholderTitle = escapeHtml(resolveText('', 'editPlaceholderTitle'));
 
     element.innerHTML = `
         <div class="hbqs-edit-placeholder"
-             title="HelpButton.qs — ${statsText}">
+             title="${placeholderTitle} — ${statsText}">
             <div class="hbqs-edit-placeholder-info">
                 <div class="hbqs-edit-placeholder-icon">
                     ${makeSvg('help', 32, '#165a9b')}
                 </div>
-                <div class="hbqs-edit-placeholder-title">HelpButton.qs</div>
+                <div class="hbqs-edit-placeholder-title">${placeholderTitle}</div>
                 <div class="hbqs-edit-placeholder-stats">${statsText}</div>
                 <div class="hbqs-edit-placeholder-actions">
                     <button class="hbqs-btn hbqs-btn--ghost hbqs-about-btn"
