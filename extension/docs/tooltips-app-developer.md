@@ -214,7 +214,7 @@ Expand the **Click Dialog** section to configure the modal that opens when the u
 | **Open dialog on click** | Enable/disable the click dialog | On |
 | **Dialog title** | Heading text (uses the tooltip label if empty) | *(empty)* |
 | **Dialog content** | Full Markdown content for the dialog body | *(empty)* |
-| **Dialog size** | Small (320×220), Medium (480×320), Large (640×420), X-Large (800×520) | Medium |
+| **Dialog size** | Small (~280px max height), Medium (~400px), Large (~500px), X-Large (~600px) | Medium |
 
 The dialog opens as a centered modal with a semi-transparent backdrop. It can be closed by:
 - Clicking the **×** close button
