@@ -86,13 +86,19 @@ export function markdownToHtml(md) {
 
     // Italic
     text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    text = text.replace(/(?<![a-zA-Z0-9])_(.+?)_(?![a-zA-Z0-9])/g, '<em>$1</em>');
+    text = text.replace(/(^|[^a-zA-Z0-9])_(.+?)_(?![a-zA-Z0-9])/g, '$1<em>$2</em>');
 
     // Paragraphs
     text = text.replace(/\n{2,}/g, '</p><p>');
 
-    // Single newlines → <br>
-    text = text.replace(/(?<!<\/(?:li|ul|ol|blockquote|h[3-6]|hr|p)>)\n(?!<)/g, '<br>');
+    // Single newlines → <br> (skip newlines after block-level closing tags)
+    text = text.replace(/\n(?!<)/g, (match, offset, str) => {
+        const before = str.slice(0, offset);
+        if (/<\/(?:li|ul|ol|blockquote|h[3-6]|hr|p)>$/.test(before)) {
+            return '\n';
+        }
+        return '<br>';
+    });
 
     // Wrap in paragraph tags
     text = `<p>${text}</p>`;

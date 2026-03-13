@@ -815,11 +815,12 @@
     cursor: pointer;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transform: var(--hbqs-tt-translate);
     pointer-events: auto;
 }
 
 .hbqs-tooltip-trigger:hover {
-    transform: scale(1.1);
+    transform: var(--hbqs-tt-translate) scale(1.1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 

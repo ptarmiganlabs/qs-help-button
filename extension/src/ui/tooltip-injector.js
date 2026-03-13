@@ -206,7 +206,7 @@ function applyPosition(iconEl, position) {
     iconEl.style.bottom = '';
     iconEl.style.left = '';
     iconEl.style.right = '';
-    iconEl.style.transform = '';
+    iconEl.style.removeProperty('--hbqs-tt-translate');
 
     switch (position) {
         case 'top-left':
@@ -216,7 +216,7 @@ function applyPosition(iconEl, position) {
         case 'top-center':
             iconEl.style.top = '4px';
             iconEl.style.left = '50%';
-            iconEl.style.transform = 'translateX(-50%)';
+            iconEl.style.setProperty('--hbqs-tt-translate', 'translateX(-50%)');
             break;
         case 'top-right':
             iconEl.style.top = '4px';
@@ -225,12 +225,12 @@ function applyPosition(iconEl, position) {
         case 'center-left':
             iconEl.style.top = '50%';
             iconEl.style.left = '4px';
-            iconEl.style.transform = 'translateY(-50%)';
+            iconEl.style.setProperty('--hbqs-tt-translate', 'translateY(-50%)');
             break;
         case 'center-right':
             iconEl.style.top = '50%';
             iconEl.style.right = '4px';
-            iconEl.style.transform = 'translateY(-50%)';
+            iconEl.style.setProperty('--hbqs-tt-translate', 'translateY(-50%)');
             break;
         case 'bottom-left':
             iconEl.style.bottom = '4px';
@@ -239,7 +239,7 @@ function applyPosition(iconEl, position) {
         case 'bottom-center':
             iconEl.style.bottom = '4px';
             iconEl.style.left = '50%';
-            iconEl.style.transform = 'translateX(-50%)';
+            iconEl.style.setProperty('--hbqs-tt-translate', 'translateX(-50%)');
             break;
         case 'bottom-right':
             iconEl.style.bottom = '4px';
