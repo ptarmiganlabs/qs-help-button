@@ -1,5 +1,67 @@
 # Changelog
 
+## [2.1.0](https://github.com/ptarmiganlabs/help-button.qs/compare/helpbutton-qs-v2.0.0...helpbutton-qs-v2.1.0) (2026-03-13)
+
+
+### Features
+
+* add feedback menu item type with star rating and comment capture ([c148547](https://github.com/ptarmiganlabs/help-button.qs/commit/c148547be4fd41d986845b51a9ec1c1ca1f5d6d3))
+* add new 'feedback' menu item type with star rating and comment fields ([1565c56](https://github.com/ptarmiganlabs/help-button.qs/commit/1565c5672d3f2ad9922fbfb7dec252ca74854c6c))
+* add Qlik Cloud user info support for bug report dialog and template fields ([cf53b0d](https://github.com/ptarmiganlabs/help-button.qs/commit/cf53b0d75c45ef227af9b90bccd9f3778d2d3450))
+* add theming support to extension with 4 predefined color presets ([8ef56d2](https://github.com/ptarmiganlabs/help-button.qs/commit/8ef56d24a9ec83066943a8e823d6d0a5a6f8da14))
+* Add theming support to extension with 4 predefined color presets ([979d827](https://github.com/ptarmiganlabs/help-button.qs/commit/979d82781c9d18d22b42396fae75d1ff7149fbf0))
+* add theming support with 4 predefined color presets ([3da4e48](https://github.com/ptarmiganlabs/help-button.qs/commit/3da4e482c453ff478fe9ffd519a68e64282713eb))
+* Add two new default menu items (bug report + feedback dialog) that are included when adding the extension to an app sheet ([dfc6476](https://github.com/ptarmiganlabs/help-button.qs/commit/dfc64768d67943f35a39aeb9ac33ea4068a0693e))
+* Apply default color/style to menu items when changing theme ([4450f2e](https://github.com/ptarmiganlabs/help-button.qs/commit/4450f2ecd30b292f81d37a48b5994697ff9c71b7))
+* **bug-report:** Add severity selection and localization support in bug report dialog ([c6b9d64](https://github.com/ptarmiganlabs/help-button.qs/commit/c6b9d648f523e0b6e011a4f365a0552cd4bb8dba))
+* **cloud:** enhance bug report dialog with additional user info fields for Qlik Cloud ([d60e55b](https://github.com/ptarmiganlabs/help-button.qs/commit/d60e55b0c133c45afd3664845b5d324e7c9847d7))
+* **extension:** add feedback menu item type and add test for feedback action ([b9c6661](https://github.com/ptarmiganlabs/help-button.qs/commit/b9c6661e83c6cb7359cf3c6a8bdd13ec321bcd7d))
+* **feedback-dialog:** Enhance feedback dialog with configurable context fields and payload options ([015705d](https://github.com/ptarmiganlabs/help-button.qs/commit/015705d5c076b21f8937b10de43ea442a2ccdec0))
+* **feedback-dialog:** Set default color for new feedback menu items ([6620a5d](https://github.com/ptarmiganlabs/help-button.qs/commit/6620a5d2fd3ac6efde3e8684b82567baea4e7743))
+* Move extension to its own ".qs Library" bundle in the Sense sheet editor ([511866a](https://github.com/ptarmiganlabs/help-button.qs/commit/511866af034ae9766c75a609262ca4e56d31339e))
+* resolve User ID and User Name on Qlik Cloud via /api/v1/users/me ([497bb92](https://github.com/ptarmiganlabs/help-button.qs/commit/497bb92195059c06aae580a5b4217d9922387a2d))
+* **tooltips:** Add configurable tooltips for any on-screen object ([4767c40](https://github.com/ptarmiganlabs/help-button.qs/commit/4767c40341a217227e907613fbeb111d2950b1a6))
+* **translations:** Gather all translation related settings in a single "Language & Translations" section in the extension's property panel ([3f5946d](https://github.com/ptarmiganlabs/help-button.qs/commit/3f5946d200e874396a1230cdb261b570f522337d))
+* **translations:** Make *all* labels and texts translatable ([b94d624](https://github.com/ptarmiganlabs/help-button.qs/commit/b94d624fdd546ffd4afcdfdbf07082cb51f72d7c))
+
+
+### Bug Fixes
+
+* address code review feedback — consistent fallback values, expand CM abbreviation ([ae01962](https://github.com/ptarmiganlabs/help-button.qs/commit/ae01962ab3625757888a2851114e66f641380535))
+* **feedback-dialog:** Better control of which fields are shown in feedback dialog, and which ones are included in the POST payload ([0d67518](https://github.com/ptarmiganlabs/help-button.qs/commit/0d67518bd0a26d37d17b90dd1f1c8b7321dc6e39))
+* keep help button visible in sheet edit mode ([a6b3afb](https://github.com/ptarmiganlabs/help-button.qs/commit/a6b3afb83224940845219e74e08ba3f05dce0308))
+* keep help button visible in sheet edit mode (rebased to main) ([cf005ce](https://github.com/ptarmiganlabs/help-button.qs/commit/cf005ce830d3a8ff08205f52de085123ac11fb4b))
+* Move demo screen capture to top of page for easy access ([30c3f71](https://github.com/ptarmiganlabs/help-button.qs/commit/30c3f71bb883c5e53170ac768c64d79bfa51aadd))
+* update extension name in preview SVG to match repository naming convention ([68616b0](https://github.com/ptarmiganlabs/help-button.qs/commit/68616b0f8105f54cd9e90225f218cdeb2a99bcfa))
+
+
+### Miscellaneous
+
+* **deps:** update dependencies to stay safe and secure ([c7a8c18](https://github.com/ptarmiganlabs/help-button.qs/commit/c7a8c181bfe6937d28cc60e101174e36cf404b9a))
+
+
+### Refactoring
+
+* improve readability of updateSubmitState in feedback dialog ([d8b7438](https://github.com/ptarmiganlabs/help-button.qs/commit/d8b74381804e82019f4c88d3d1d00a39ca19a05e))
+
+
+### Documentation
+
+* add discussion draft for master item workaround ([d0f73bd](https://github.com/ptarmiganlabs/help-button.qs/commit/d0f73bd2a4c016ca50ecbd6c660e58fc460a0917))
+* add investigation document for help button visibility issue ([051283f](https://github.com/ptarmiganlabs/help-button.qs/commit/051283fea8a3437f04ee13d8056aa8f244215295))
+* add multi-language documentation for extension variant ([b4ade49](https://github.com/ptarmiganlabs/help-button.qs/commit/b4ade49bcfb79e30f1b371cc486c71da60e7e5dd))
+* add multi-language documentation for the extension variant ([7b4dc80](https://github.com/ptarmiganlabs/help-button.qs/commit/7b4dc8091880b057f48a6caa3ed9ad145d81a5d5))
+* add theming documentation to both variant READMEs ([a8af14e](https://github.com/ptarmiganlabs/help-button.qs/commit/a8af14e13a729d0d9e6d828f1f62ad9e19acadcd))
+* **feedback-dialog:** Include feedback dialog strings in docs for translation system ([498784c](https://github.com/ptarmiganlabs/help-button.qs/commit/498784c8022e536e6162bccd822dfda863d6971e))
+* fix issue link and name in investigation document ([58b2277](https://github.com/ptarmiganlabs/help-button.qs/commit/58b227768b107c122147a31501c962ad2dd33097))
+* investigation of help button visibility on non-host sheets ([f3e6c46](https://github.com/ptarmiganlabs/help-button.qs/commit/f3e6c46872c2ace3505300953c56dda43a68e7eb))
+* remove discussion draft for master item workaround ([23db036](https://github.com/ptarmiganlabs/help-button.qs/commit/23db036a7c90b272484ff190bc24dcd0285ad0f8))
+* restructure multi-language doc for Discussions Show & Tell format ([876dc27](https://github.com/ptarmiganlabs/help-button.qs/commit/876dc27565983f7bd3674239bc48e56a09e50a41))
+* **translations:** Describe the new, centralized translations properties in the extension ([1304009](https://github.com/ptarmiganlabs/help-button.qs/commit/13040090950a5efcd87e8afe6c0443f3d74de13b))
+* update multi-language documentation with notes on visibility and future enhancements ([ea06efc](https://github.com/ptarmiganlabs/help-button.qs/commit/ea06efceaaed7cdcc2328df41c96b3579ee9acdb))
+* update READMEs with feedback menu item type documentation ([a3eaa5d](https://github.com/ptarmiganlabs/help-button.qs/commit/a3eaa5d6e65b5272952de1630d481c341cdcd99b))
+* update workaround instructions for HelpButton.qs visibility ([686ecab](https://github.com/ptarmiganlabs/help-button.qs/commit/686ecab99ac785065d38046f746b3f2856820bcc))
+
 ## [2.0.0](https://github.com/ptarmiganlabs/help-button.qs/compare/helpbutton-qs-v1.3.1...helpbutton-qs-v2.0.0) (2026-03-06)
 
 
