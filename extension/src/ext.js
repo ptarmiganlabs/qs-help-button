@@ -12,6 +12,7 @@ import { toPickerObj } from './util/color';
 import { ICON_NAMES } from './ui/icons';
 import translations from './i18n/translations';
 import { PRESET_LABELS, applyPreset } from './theme/presets';
+import { TIMESTAMP_FORMAT_OPTIONS, DEFAULT_DIALOG_FORMAT, DEFAULT_PAYLOAD_FORMAT } from './util/timestamp-formats';
 
 export default function ext(_galaxy) {
     /**
@@ -828,6 +829,22 @@ export default function ext(_galaxy) {
                                                     defaultValue: '',
                                                     maxlength: 128,
                                                 },
+                                                brDialogTimestampFormat: {
+                                                    ref: 'bugReport.dialogTimestampFormat',
+                                                    label: 'Dialog timestamp format',
+                                                    type: 'string',
+                                                    component: 'dropdown',
+                                                    defaultValue: DEFAULT_DIALOG_FORMAT,
+                                                    options: TIMESTAMP_FORMAT_OPTIONS,
+                                                },
+                                                brPayloadTimestampFormat: {
+                                                    ref: 'bugReport.payloadTimestampFormat',
+                                                    label: 'Payload timestamp format',
+                                                    type: 'string',
+                                                    component: 'dropdown',
+                                                    defaultValue: DEFAULT_PAYLOAD_FORMAT,
+                                                    options: TIMESTAMP_FORMAT_OPTIONS,
+                                                },
                                             },
                                         },
                                         brDialogFieldsSection: {
@@ -958,6 +975,22 @@ export default function ext(_galaxy) {
                                                     type: 'string',
                                                     defaultValue: '',
                                                     maxlength: 128,
+                                                },
+                                                feedbackDialogTimestampFormat: {
+                                                    ref: 'feedback.dialogTimestampFormat',
+                                                    label: 'Dialog timestamp format',
+                                                    type: 'string',
+                                                    component: 'dropdown',
+                                                    defaultValue: DEFAULT_DIALOG_FORMAT,
+                                                    options: TIMESTAMP_FORMAT_OPTIONS,
+                                                },
+                                                feedbackPayloadTimestampFormat: {
+                                                    ref: 'feedback.payloadTimestampFormat',
+                                                    label: 'Payload timestamp format',
+                                                    type: 'string',
+                                                    component: 'dropdown',
+                                                    defaultValue: DEFAULT_PAYLOAD_FORMAT,
+                                                    options: TIMESTAMP_FORMAT_OPTIONS,
                                                 },
                                             },
                                         },

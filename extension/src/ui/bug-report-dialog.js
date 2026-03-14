@@ -13,6 +13,7 @@ import { escapeHtml, resolveTemplateFields } from '../util/template-fields';
 import { resolveText } from '../i18n/index';
 import logger from '../util/logger';
 import { fetchSenseVersionLabel } from '../util/product-info';
+import { formatTimestamp, DEFAULT_DIALOG_FORMAT, DEFAULT_PAYLOAD_FORMAT } from '../util/timestamp-formats';
 
 // ---------------------------------------------------------------------------
 // Field labels — maps internal field keys to user-visible labels.
@@ -82,6 +83,8 @@ export function openBugReportDialog(config, platformType) {
         enableSeverity = true,
         descriptionMaxLength = 1000,
         dialogStrings = {},
+        dialogTimestampFormat = DEFAULT_DIALOG_FORMAT,
+        payloadTimestampFormat = DEFAULT_PAYLOAD_FORMAT,
     } = config;
 
     // Derive which fields to show in the dialog and which to send in the payload.
@@ -212,7 +215,7 @@ export function openBugReportDialog(config, platformType) {
     let descriptionTextarea = null;
 
     // -- Gather context asynchronously, then build the form --
-    gatherContextData(allFields, platformType).then((context) => {
+    gatherContextData(allFields, platformType, dialogTimestampFormat).then((context) => {
         logger.debug('Context gathered:', JSON.stringify(context, null, 2));
 
         // Remove loading indicator
@@ -397,8 +400,14 @@ export function openBugReportDialog(config, platformType) {
                     }
                 }
 
+                // Re-format payload context timestamp using the payload format
+                // (dialog context may use a different format for display).
+                if (payloadContext.timestamp !== undefined) {
+                    payloadContext.timestamp = formatTimestamp(new Date(), payloadTimestampFormat);
+                }
+
                 const payload = {
-                    timestamp: new Date().toISOString(),
+                    timestamp: formatTimestamp(new Date(), payloadTimestampFormat),
                     context: payloadContext,
                     description: descriptionTextarea.value.trim(),
                 };
@@ -598,7 +607,7 @@ function getSenseVersion() {
  * @param {'client-managed' | 'cloud'} platformType - Current platform.
  * @returns {Promise<Record<string, string>>}
  */
-function gatherContextData(fields, platformType) {
+function gatherContextData(fields, platformType, timestampFmt) {
     const path = window.location.pathname;
     const appMatch = path.match(/\/app\/([0-9a-f-]{36})/i);
     const sheetMatch = path.match(/\/sheet\/([^/]+)/);
@@ -666,7 +675,7 @@ function gatherContextData(fields, platformType) {
                     context.browser = navigator.userAgent;
                     break;
                 case 'timestamp':
-                    context.timestamp = new Date().toLocaleString();
+                    context.timestamp = formatTimestamp(new Date(), timestampFmt || DEFAULT_DIALOG_FORMAT);
                     break;
                 default:
                     logger.debug('Unknown collect field:', field);
