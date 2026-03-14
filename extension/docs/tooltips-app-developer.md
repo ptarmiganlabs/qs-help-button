@@ -23,6 +23,9 @@ This guide covers everything a Qlik Sense app developer needs to configure toolt
     - [Tips for Stable Selectors](#tips-for-stable-selectors)
     - [Example: Target a Specific Chart Title](#example-target-a-specific-chart-title)
     - [Example: Target All Chart Containers](#example-target-all-chart-containers)
+  - [Show Condition (Visibility)](#show-condition-visibility)
+    - [Examples](#examples)
+    - [How It Works](#how-it-works)
   - [Configuring the Icon](#configuring-the-icon)
   - [Hover Content](#hover-content)
   - [Click Dialog](#click-dialog)
@@ -156,6 +159,39 @@ article[role="application"]
 ```
 
 > **Warning:** Auto-generated selectors from "Copy selector" often include fragile positional references like `:nth-child(3)`. Always simplify to the most stable attributes possible.
+
+---
+
+## Show Condition (Visibility)
+
+The **Show condition** field controls whether a tooltip is visible or hidden at runtime. It appears in the property panel directly below the target type fields.
+
+- **Empty** (default): The tooltip is always visible.
+- **Literal value**: Enter any non-zero value (e.g. `1`) to show, or `0` to hide.
+- **Expression**: Click the **fx** toggle (or prefix with `=`) to enter a Qlik expression that is evaluated dynamically. The tooltip is hidden when the expression evaluates to `0`.
+
+### Examples
+
+| Show condition value | Result |
+|---|---|
+| *(empty)* | Always visible |
+| `1` | Always visible |
+| `0` | Always hidden |
+| `=False()` | Always hidden (evaluates to `0` / `"False"`) |
+| `=True()` | Always visible (evaluates to `-1` / `"True"`) |
+| `=GetSelectedCount(Country) > 0` | Visible only when a Country selection exists |
+| `=if(Sum(Revenue) > 1000000, 1, 0)` | Visible when total revenue exceeds 1,000,000 |
+
+### How It Works
+
+Qlik Sense evaluates the expression on every render and passes the result through the layout. Because the property uses `expression: 'optional'`, Qlik resolves it as a string expression (`qStringExpression`). The extension checks the evaluated value:
+
+- If the value is `0`, the string `'0'`, or the string `'False'` (case-insensitive), the tooltip icon is **not injected** into the page.
+- Any other value (including non-zero numbers, `'True'`, and other non-numeric strings) means the tooltip **is visible**.
+
+> **Note:** `=False()` is a Qlik dual value — its numeric part is `0` but its string representation is `"False"`. The extension handles both forms correctly.
+
+> **Tip:** Use this feature to show contextual help only when relevant — for example, display a tooltip on a chart only when the user has made a particular selection.
 
 ---
 

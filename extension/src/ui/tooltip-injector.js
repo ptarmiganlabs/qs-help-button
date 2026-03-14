@@ -44,6 +44,12 @@ export function injectTooltips(layout, adapter, platform) {
     pendingItems = [];
 
     tooltips.forEach((item, index) => {
+        // Visibility check: skip tooltip when showCondition evaluates to 0
+        if (isTooltipHidden(item)) {
+            logger.debug(`Tooltip "${item.tooltipLabel}" hidden by show condition`);
+            return;
+        }
+
         const targetEl = resolveTarget(item, adapter, platform);
         if (targetEl) {
             mountTooltipIcon(item, targetEl, index);
@@ -85,6 +91,34 @@ export function destroyTooltips() {
 
     // Hide any active hover
     hideHover();
+}
+
+/**
+ * Determine whether a tooltip should be hidden based on its show condition.
+ *
+ * An empty or undefined condition means the tooltip is always visible.
+ * A condition that evaluates to 0 hides the tooltip.
+ *
+ * With `expression: 'optional'`, Qlik resolves the value as a
+ * qStringExpression, so `=False()` arrives as the string `"False"`
+ * (not the numeric 0). We therefore check both the numeric coercion
+ * and the string representation of Qlik's False() dual value.
+ *
+ * @param {object} item - Tooltip configuration item.
+ * @returns {boolean} True if the tooltip should be hidden.
+ */
+function isTooltipHidden(item) {
+    let condition = item.showCondition;
+    if (condition === undefined || condition === null) return false;
+    if (typeof condition === 'string') {
+        condition = condition.trim();
+        if (condition === '') return false;
+    }
+    // Numeric 0 or string "0" — hidden
+    if (Number(condition) === 0) return true;
+    // =False() with expression:'optional' returns the string "False"
+    if (typeof condition === 'string' && condition.toLowerCase() === 'false') return true;
+    return false;
 }
 
 /**

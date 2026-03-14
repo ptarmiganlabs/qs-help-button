@@ -90,6 +90,7 @@ export default {
             targetType: 'css',
             targetCssSelector: '#sheet-title > header',
             targetObjectId: '',
+            showCondition: '',
             iconName: 'info',
             iconSize: 20,
             iconPosition: 'center-right',
