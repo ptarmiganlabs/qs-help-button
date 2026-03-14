@@ -15,6 +15,7 @@ import { escapeHtml, resolveTemplateFields } from '../util/template-fields';
 import { resolveText } from '../i18n/index';
 import logger from '../util/logger';
 import { fetchSenseVersionLabel } from '../util/product-info';
+import { formatTimestamp, DEFAULT_DIALOG_FORMAT, DEFAULT_PAYLOAD_FORMAT } from '../util/timestamp-formats';
 
 // ---------------------------------------------------------------------------
 // Field labels — maps internal field keys to user-visible labels.
@@ -87,6 +88,8 @@ export function openFeedbackDialog(config, platformType) {
         enableComment = true,
         commentMaxLength = 500,
         dialogStrings = {},
+        dialogTimestampFormat = DEFAULT_DIALOG_FORMAT,
+        payloadTimestampFormat = DEFAULT_PAYLOAD_FORMAT,
     } = config;
 
     // Derive which fields to show in the dialog and which to send in the payload.
@@ -211,7 +214,7 @@ export function openFeedbackDialog(config, platformType) {
     let commentTextarea = null;
 
     // Build the form once context is gathered
-    gatherContextData(allFields, platformType).then((context) => {
+    gatherContextData(allFields, platformType, dialogTimestampFormat).then((context) => {
         // --- Context fields (read-only) ---
         // Track fields already rendered as the right side of a pair.
         const rendered = new Set();
@@ -381,6 +384,9 @@ export function openFeedbackDialog(config, platformType) {
                 '<span>' + escapeHtml(submitText) + '</span>';
 
             try {
+                // Capture a single instant so all payload timestamps are consistent.
+                const now = new Date();
+
                 // Build payload context using only payloadFields.
                 const payloadContext = {};
                 for (const f of payloadFields) {
@@ -389,8 +395,14 @@ export function openFeedbackDialog(config, platformType) {
                     }
                 }
 
+                // Re-format payload context timestamp using the payload format
+                // (dialog context may use a different format for display).
+                if (payloadContext.timestamp !== undefined) {
+                    payloadContext.timestamp = formatTimestamp(now, payloadTimestampFormat);
+                }
+
                 const payload = {
-                    timestamp: new Date().toISOString(),
+                    timestamp: formatTimestamp(now, payloadTimestampFormat),
                     context: payloadContext,
                 };
 
@@ -611,7 +623,7 @@ function getSenseVersion() {
  * @param {'client-managed' | 'cloud'} platformType - Current platform.
  * @returns {Promise<Record<string, string>>}
  */
-function gatherContextData(fields, platformType) {
+function gatherContextData(fields, platformType, timestampFmt) {
     const path = window.location.pathname;
     const appMatch = path.match(/\/app\/([0-9a-f-]{36})/i);
     const sheetMatch = path.match(/\/sheet\/([^/]+)/);
@@ -649,7 +661,7 @@ function gatherContextData(fields, platformType) {
                 case 'urlPath':      context.urlPath = window.location.pathname + window.location.search; break;
                 case 'platform':     context.platform = platformType; break;
                 case 'browser':      context.browser = navigator.userAgent; break;
-                case 'timestamp':    context.timestamp = new Date().toLocaleString(); break;
+                case 'timestamp':    context.timestamp = formatTimestamp(new Date(), timestampFmt || DEFAULT_DIALOG_FORMAT); break;
                 default:             logger.debug('Unknown collect field:', field); break;
             }
         }

@@ -121,7 +121,8 @@ function renderDashboard() {
     const desc = b.description
       ? `<div class="desc">${escapeHtml(b.description.length > 200 ? b.description.substring(0, 200) + '…' : b.description)}</div>`
       : '';
-    return `<div class="card bug"><div class="card-header"><span class="badge bug-badge">BUG REPORT</span><span class="ts">${escapeHtml(b.receivedAt)}</span></div>${renderContextTable(b.context)}${sev}${desc}</div>`;
+    const clientTs = b.clientTimestamp ? `<span class="ts" title="Client timestamp">${escapeHtml(b.clientTimestamp)}</span>` : '';
+    return `<div class="card bug"><div class="card-header"><span class="badge bug-badge">BUG REPORT</span>${clientTs}<span class="ts">${escapeHtml(b.receivedAt)}</span></div>${renderContextTable(b.context)}${sev}${desc}</div>`;
   }).join('');
 
   const fbRows = feedbackEntries.map((f) => {
@@ -129,7 +130,8 @@ function renderDashboard() {
     const comment = f.comment
       ? `<div class="desc">${escapeHtml(f.comment.length > 200 ? f.comment.substring(0, 200) + '…' : f.comment)}</div>`
       : '';
-    return `<div class="card fb"><div class="card-header"><span class="badge fb-badge">FEEDBACK</span><span class="ts">${escapeHtml(f.receivedAt)}</span></div>${renderContextTable(f.context)}${rating}${comment}</div>`;
+    const clientTs = f.clientTimestamp ? `<span class="ts" title="Client timestamp">${escapeHtml(f.clientTimestamp)}</span>` : '';
+    return `<div class="card fb"><div class="card-header"><span class="badge fb-badge">FEEDBACK</span>${clientTs}<span class="ts">${escapeHtml(f.receivedAt)}</span></div>${renderContextTable(f.context)}${rating}${comment}</div>`;
   }).join('');
 
   return `<!DOCTYPE html>
@@ -236,9 +238,13 @@ app.post('/api/bug-reports', (req, res) => {
   }
 
   // --- Store ---
+  // The client-provided timestamp may use any of the supported format strings
+  // (e.g. ISO 8601, locale-specific, compact) configured in the extension.
+  // We store both the original client timestamp and a server-side receivedAt.
   const entry = {
     id: `br-${Date.now()}`,
     receivedAt: new Date().toISOString(),
+    clientTimestamp: timestamp,
     context,
     description,
     severity: severity || null,
@@ -304,9 +310,13 @@ app.post('/api/feedback', (req, res) => {
   }
 
   // --- Store ---
+  // The client-provided timestamp may use any of the supported format strings
+  // (e.g. ISO 8601, locale-specific, compact) configured in the extension.
+  // We store both the original client timestamp and a server-side receivedAt.
   const entry = {
     id: `fb-${Date.now()}`,
     receivedAt: new Date().toISOString(),
+    clientTimestamp: timestamp,
     context,
     rating: hasRating ? rating : null,
     comment: hasComment ? comment : null,

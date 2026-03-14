@@ -9,6 +9,7 @@
  */
 
 import { toPickerObj } from './util/color';
+import { DEFAULT_DIALOG_FORMAT, DEFAULT_PAYLOAD_FORMAT } from './util/timestamp-formats';
 
 export default {
     showTitles: false,
@@ -129,6 +130,8 @@ export default {
                 authToken: '',
                 enableSeverity: true,
                 descriptionMaxLength: 1000,
+                dialogTimestampFormat: DEFAULT_DIALOG_FORMAT,
+                payloadTimestampFormat: DEFAULT_PAYLOAD_FORMAT,
                 dialogFields: {
                     userName: true, appId: true, sheetId: true,
                     urlPath: true, platform: true, timestamp: true,
@@ -152,6 +155,8 @@ export default {
                 enableRating: true,
                 enableComment: true,
                 commentMaxLength: 500,
+                dialogTimestampFormat: DEFAULT_DIALOG_FORMAT,
+                payloadTimestampFormat: DEFAULT_PAYLOAD_FORMAT,
                 dialogFields: {
                     userName: true, appId: true, sheetId: true,
                     urlPath: true, platform: true, timestamp: true,
@@ -185,6 +190,8 @@ export default {
                 authToken: '',
                 enableSeverity: true,
                 descriptionMaxLength: 1000,
+                dialogTimestampFormat: DEFAULT_DIALOG_FORMAT,
+                payloadTimestampFormat: DEFAULT_PAYLOAD_FORMAT,
                 dialogFields: {
                     userName: true, appId: true, sheetId: true,
                     urlPath: true, platform: true, timestamp: true,
@@ -208,6 +215,8 @@ export default {
                 enableRating: true,
                 enableComment: true,
                 commentMaxLength: 500,
+                dialogTimestampFormat: DEFAULT_DIALOG_FORMAT,
+                payloadTimestampFormat: DEFAULT_PAYLOAD_FORMAT,
                 dialogFields: {
                     userName: true, appId: true, sheetId: true,
                     urlPath: true, platform: true, timestamp: true,
@@ -241,6 +250,8 @@ export default {
                 authToken: '',
                 enableSeverity: true,
                 descriptionMaxLength: 1000,
+                dialogTimestampFormat: DEFAULT_DIALOG_FORMAT,
+                payloadTimestampFormat: DEFAULT_PAYLOAD_FORMAT,
                 dialogFields: {
                     userName: true, appId: true, sheetId: true,
                     urlPath: true, platform: true, timestamp: true,
@@ -264,6 +275,8 @@ export default {
                 enableRating: true,
                 enableComment: true,
                 commentMaxLength: 500,
+                dialogTimestampFormat: DEFAULT_DIALOG_FORMAT,
+                payloadTimestampFormat: DEFAULT_PAYLOAD_FORMAT,
                 dialogFields: {
                     userName: true, appId: true, sheetId: true,
                     urlPath: true, platform: true, timestamp: true,
@@ -297,6 +310,8 @@ export default {
                 authToken: '',
                 enableSeverity: true,
                 descriptionMaxLength: 1000,
+                dialogTimestampFormat: DEFAULT_DIALOG_FORMAT,
+                payloadTimestampFormat: DEFAULT_PAYLOAD_FORMAT,
                 dialogFields: {
                     userName: true, appId: true, sheetId: true,
                     urlPath: true, platform: true, timestamp: true,
@@ -320,6 +335,8 @@ export default {
                 enableRating: true,
                 enableComment: true,
                 commentMaxLength: 500,
+                dialogTimestampFormat: DEFAULT_DIALOG_FORMAT,
+                payloadTimestampFormat: DEFAULT_PAYLOAD_FORMAT,
                 dialogFields: {
                     userName: true, appId: true, sheetId: true,
                     urlPath: true, platform: true, timestamp: true,
