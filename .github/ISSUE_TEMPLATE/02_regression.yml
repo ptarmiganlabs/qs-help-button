@@ -29,10 +29,21 @@ body:
       description: 'The last version where the issue did not occur — for example: 2.0.0'
     validations:
       required: true
+  - type: dropdown
+    attributes:
+      label: Which Qlik Sense environment are you using?
+      description: 'Is the bug related to Qlik Sense Client-Managed, Qlik Cloud, or both?'
+      options:
+        - Qlik Cloud
+        - Qlik Sense Enterprise on Windows (Client-Managed)
+        - Both
+        - Not sure
+    validations:
+      required: true
   - type: input
     attributes:
       label: What Qlik Sense version are you using?
-      description: 'For example: 2025 November IR (8.527.8)'
+      description: 'For example: 2025 November IR (8.527.8). For Qlik Cloud, enter N/A'
     validations:
       required: true
   - type: input
