@@ -67,16 +67,16 @@ export function createPopupMenu(triggerButton, config) {
     // -- Menu items --
     // Filter out items where showCondition is defined and evaluates to false/0
     const visibleMenuItems = menuItems.filter((item) => {
-        // If showCondition is undefined or empty string, it's considered true
-        if (!item.showCondition || item.showCondition.trim() === '') {
+        // If showCondition is undefined or placeholder, show the item.
+        // If it's an expression, the engine replaces it in the layout with the result string.
+        if (item.showCondition === undefined || item.showCondition === null || item.showCondition === '') {
             return true;
         }
 
-        // Qlik expressions are evaluated by the engine; for 'string' type properties 
-        // with 'expression: optional', evaluating them to numbers is tricky.
-        // Usually, 0 or empty string means hide.
-        const condition = item.showCondition;
-        return condition !== '0' && condition !== 'false' && condition !== '';
+        // Qlik expressions returning false/0 often result in the string "0".
+        // Hide ONLY if explicitly "0" or "false".
+        const condition = String(item.showCondition).trim();
+        return condition !== '0' && condition.toLowerCase() !== 'false';
     });
 
     visibleMenuItems.forEach((item, idx) => {
