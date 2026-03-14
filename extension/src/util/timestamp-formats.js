@@ -19,7 +19,7 @@ export const TIMESTAMP_FORMAT_OPTIONS = [
   { value: "Mon DD, YYYY hh:mm:ss A", label: "Mar 14, 2026 10:47:55 AM" },
   { value: "Month DD, YYYY hh:mm:ss A", label: "March 14, 2026 10:47:55 AM" },
   { value: "DD/MM/YYYY, HH:mm:ss", label: "14/03/2026, 10:47:55" },
-  { value: "MM/DD/YYYY, hh:mm:ss A", label: "3/14/2026, 10:47:55 AM" },
+  { value: "MM/DD/YYYY, hh:mm:ss A", label: "03/14/2026, 10:47:55 AM" },
   { value: "ISO8601", label: "2026-03-14T10:47:55 (ISO 8601, no TZ)" },
   { value: "ISO8601Z", label: "2026-03-14T10:47:55Z (ISO 8601 UTC)" },
   {
