@@ -108,12 +108,16 @@ export function destroyTooltips() {
  * @returns {boolean} True if the tooltip should be hidden.
  */
 function isTooltipHidden(item) {
-    const condition = item.showCondition;
-    if (condition === undefined || condition === null || condition === '') return false;
+    let condition = item.showCondition;
+    if (condition === undefined || condition === null) return false;
+    if (typeof condition === 'string') {
+        condition = condition.trim();
+        if (condition === '') return false;
+    }
     // Numeric 0 or string "0" — hidden
     if (Number(condition) === 0) return true;
     // =False() with expression:'optional' returns the string "False"
-    if (typeof condition === 'string' && condition.trim().toLowerCase() === 'false') return true;
+    if (typeof condition === 'string' && condition.toLowerCase() === 'false') return true;
     return false;
 }
 
