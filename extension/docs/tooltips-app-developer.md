@@ -178,7 +178,7 @@ The **Show condition** field controls whether a tooltip is visible or hidden at 
 | `1` | Always visible |
 | `0` | Always hidden |
 | `=GetSelectedCount(Country) > 0` | Visible only when a Country selection exists |
-| `=if(Sum(Revenue) > 1000000, 1, 0)` | Visible when total revenue exceeds 1 000 000 |
+| `=if(Sum(Revenue) > 1000000, 1, 0)` | Visible when total revenue exceeds 1,000,000 |
 
 ### How It Works
 
