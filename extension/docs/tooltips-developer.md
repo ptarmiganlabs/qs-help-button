@@ -66,6 +66,9 @@ Each tooltip is stored as an item in the `layout.tooltips` array. The full prope
     targetObjectId: 'abc123-def456',          // Qlik object ID (when targetType === 'object')
     targetCssSelector: '',                    // CSS selector (when targetType === 'css')
 
+    // Visibility
+    showCondition: '',                        // expression: 'optional' — evaluated; 0 hides the tooltip
+
     // Icon appearance
     iconName: 'info',                         // Icon key from ICONS map
     iconSize: 20,                             // px

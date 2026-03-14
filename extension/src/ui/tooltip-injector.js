@@ -44,6 +44,12 @@ export function injectTooltips(layout, adapter, platform) {
     pendingItems = [];
 
     tooltips.forEach((item, index) => {
+        // Visibility check: skip tooltip when showCondition evaluates to 0
+        if (isTooltipHidden(item)) {
+            logger.debug(`Tooltip "${item.tooltipLabel}" hidden by show condition`);
+            return;
+        }
+
         const targetEl = resolveTarget(item, adapter, platform);
         if (targetEl) {
             mountTooltipIcon(item, targetEl, index);
@@ -85,6 +91,22 @@ export function destroyTooltips() {
 
     // Hide any active hover
     hideHover();
+}
+
+/**
+ * Determine whether a tooltip should be hidden based on its show condition.
+ *
+ * An empty or undefined condition means the tooltip is always visible.
+ * A condition that evaluates to 0 (number or string) hides the tooltip.
+ *
+ * @param {object} item - Tooltip configuration item.
+ * @returns {boolean} True if the tooltip should be hidden.
+ */
+function isTooltipHidden(item) {
+    const condition = item.showCondition;
+    if (condition === undefined || condition === null || condition === '') return false;
+    // Qlik expressions evaluate to numbers; treat 0 as hidden
+    return Number(condition) === 0;
 }
 
 /**

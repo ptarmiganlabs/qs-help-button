@@ -1143,6 +1143,13 @@ export default function ext(_galaxy) {
                                     maxlength: 512,
                                     show: (item) => item.targetType === 'css',
                                 },
+                                showCondition: {
+                                    ref: 'showCondition',
+                                    label: 'Show condition',
+                                    type: 'string',
+                                    expression: 'optional',
+                                    defaultValue: '',
+                                },
 
                                 // -- Icon appearance --
                                 iconAppearance: {
