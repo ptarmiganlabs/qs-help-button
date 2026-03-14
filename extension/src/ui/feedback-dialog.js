@@ -702,7 +702,7 @@ function buildAuthHeaders(strategy, options) {
         case 'custom':
             if (Array.isArray(options.customHeaders)) {
                 options.customHeaders.forEach((header) => {
-                    if (header.name && header.value) {
+                    if (header && header.name && header.value) {
                         headers[header.name] = header.value;
                     }
                 });
