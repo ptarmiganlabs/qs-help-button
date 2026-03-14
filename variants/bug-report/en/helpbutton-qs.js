@@ -93,13 +93,6 @@
       webhookUrl: '',  // REQUIRED — the URL to POST the bug report to
       webhookMethod: 'POST',
 
-      // Timestamp format for the dialog display
-      // See the formatTimestamp function for all supported format keys.
-      dialogTimestampFormat: 'YYYY-MM-DD HH:mm:ss',
-
-      // Timestamp format for the webhook payload
-      payloadTimestampFormat: 'ISO8601Z',
-
       // Authentication strategy: 'none' | 'header' | 'sense-session' | 'custom'
       auth: {
         type: 'none',
@@ -272,83 +265,6 @@
     var div = document.createElement('div');
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
-  }
-
-  // ---------------------------------------------------------------------------
-  // Timestamp formatting
-  // ---------------------------------------------------------------------------
-
-  var MONTHS_LONG = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-  ];
-  var MONTHS_SHORT = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-
-  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
-  function ampm(h) { return h < 12 ? 'AM' : 'PM'; }
-  function hours12(h) { var h12 = h % 12; return h12 === 0 ? 12 : h12; }
-
-  function tzOffsetString(date) {
-    var offsetMin = date.getTimezoneOffset();
-    var sign = offsetMin <= 0 ? '+' : '-';
-    var absMin = Math.abs(offsetMin);
-    return sign + pad2(Math.floor(absMin / 60)) + ':' + pad2(absMin % 60);
-  }
-
-  /**
-   * Format a Date object according to a named format key.
-   * Supported formats:
-   *   'YYYY-MM-DD HH:mm:ss'       — 2026-03-14 10:47:55
-   *   'DD Month YYYY HH:mm:ss'    — 14 March 2026 10:47:55
-   *   'Mon DD, YYYY hh:mm:ss A'   — Mar 14, 2026 10:47:55 AM
-   *   'Month DD, YYYY hh:mm:ss A' — March 14, 2026 10:47:55 AM
-   *   'DD/MM/YYYY, HH:mm:ss'      — 14/03/2026, 10:47:55
-   *   'MM/DD/YYYY, hh:mm:ss A'    — 3/14/2026, 10:47:55 AM
-   *   'ISO8601'                    — 2026-03-14T10:47:55
-   *   'ISO8601Z'                   — 2026-03-14T10:47:55Z (UTC)
-   *   'ISO8601Offset'              — 2026-03-14T10:47:55+01:00
-   *   'DD-Mon-YYYY HH:mm:ss'      — 14-Mar-2026 10:47:55
-   *   'ISO8601Compact'             — 20260314T104755
-   */
-  function formatTimestamp(date, formatKey) {
-    if (!(date instanceof Date) || isNaN(date.getTime())) return '(invalid date)';
-    var Y = date.getFullYear();
-    var M = date.getMonth();
-    var D = date.getDate();
-    var H = date.getHours();
-    var m = date.getMinutes();
-    var s = date.getSeconds();
-
-    switch (formatKey) {
-      case 'YYYY-MM-DD HH:mm:ss':
-        return Y + '-' + pad2(M + 1) + '-' + pad2(D) + ' ' + pad2(H) + ':' + pad2(m) + ':' + pad2(s);
-      case 'DD Month YYYY HH:mm:ss':
-        return D + ' ' + MONTHS_LONG[M] + ' ' + Y + ' ' + pad2(H) + ':' + pad2(m) + ':' + pad2(s);
-      case 'Mon DD, YYYY hh:mm:ss A':
-        return MONTHS_SHORT[M] + ' ' + D + ', ' + Y + ' ' + pad2(hours12(H)) + ':' + pad2(m) + ':' + pad2(s) + ' ' + ampm(H);
-      case 'Month DD, YYYY hh:mm:ss A':
-        return MONTHS_LONG[M] + ' ' + D + ', ' + Y + ' ' + pad2(hours12(H)) + ':' + pad2(m) + ':' + pad2(s) + ' ' + ampm(H);
-      case 'DD/MM/YYYY, HH:mm:ss':
-        return pad2(D) + '/' + pad2(M + 1) + '/' + Y + ', ' + pad2(H) + ':' + pad2(m) + ':' + pad2(s);
-      case 'MM/DD/YYYY, hh:mm:ss A':
-        return (M + 1) + '/' + D + '/' + Y + ', ' + pad2(hours12(H)) + ':' + pad2(m) + ':' + pad2(s) + ' ' + ampm(H);
-      case 'ISO8601':
-        return Y + '-' + pad2(M + 1) + '-' + pad2(D) + 'T' + pad2(H) + ':' + pad2(m) + ':' + pad2(s);
-      case 'ISO8601Z':
-        return date.getUTCFullYear() + '-' + pad2(date.getUTCMonth() + 1) + '-' + pad2(date.getUTCDate()) + 'T' +
-               pad2(date.getUTCHours()) + ':' + pad2(date.getUTCMinutes()) + ':' + pad2(date.getUTCSeconds()) + 'Z';
-      case 'ISO8601Offset':
-        return Y + '-' + pad2(M + 1) + '-' + pad2(D) + 'T' + pad2(H) + ':' + pad2(m) + ':' + pad2(s) + tzOffsetString(date);
-      case 'DD-Mon-YYYY HH:mm:ss':
-        return pad2(D) + '-' + MONTHS_SHORT[M] + '-' + Y + ' ' + pad2(H) + ':' + pad2(m) + ':' + pad2(s);
-      case 'ISO8601Compact':
-        return '' + Y + pad2(M + 1) + pad2(D) + 'T' + pad2(H) + pad2(m) + pad2(s);
-      default:
-        return date.toISOString();
-    }
   }
 
   // ---------------------------------------------------------------------------
@@ -891,7 +807,7 @@
     }
 
     var payload = {
-      timestamp: formatTimestamp(new Date(), br.payloadTimestampFormat || 'ISO8601Z'),
+      timestamp: new Date().toISOString(),
       context: contextData,
       description: description,
     };

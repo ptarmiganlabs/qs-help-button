@@ -144,30 +144,6 @@ window.helpButtonQsConfig = {
     webhookMethod: 'POST',
 
     /**
-     * Timestamp format shown in the dialog.
-     *
-     * Supported values:
-     *   'YYYY-MM-DD HH:mm:ss'       — 2026-03-14 10:47:55
-     *   'DD Month YYYY HH:mm:ss'    — 14 March 2026 10:47:55
-     *   'Mon DD, YYYY hh:mm:ss A'   — Mar 14, 2026 10:47:55 AM
-     *   'Month DD, YYYY hh:mm:ss A' — March 14, 2026 10:47:55 AM
-     *   'DD/MM/YYYY, HH:mm:ss'      — 14/03/2026, 10:47:55
-     *   'MM/DD/YYYY, hh:mm:ss A'    — 3/14/2026, 10:47:55 AM
-     *   'ISO8601'                    — 2026-03-14T10:47:55
-     *   'ISO8601Z'                   — 2026-03-14T10:47:55Z (UTC)
-     *   'ISO8601Offset'              — 2026-03-14T10:47:55+01:00
-     *   'DD-Mon-YYYY HH:mm:ss'      — 14-Mar-2026 10:47:55
-     *   'ISO8601Compact'             — 20260314T104755
-     */
-    // dialogTimestampFormat: 'YYYY-MM-DD HH:mm:ss',
-
-    /**
-     * Timestamp format used in the webhook POST payload.
-     * Same options as dialogTimestampFormat above.
-     */
-    // payloadTimestampFormat: 'ISO8601Z',
-
-    /**
      * Authentication strategy for the webhook call.
      *
      * type: 'none'           — No authentication (rely on network-level security)
