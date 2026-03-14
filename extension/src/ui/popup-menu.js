@@ -65,7 +65,21 @@ export function createPopupMenu(triggerButton, config) {
     popup.appendChild(header);
 
     // -- Menu items --
-    menuItems.forEach((item, idx) => {
+    // Filter out items where showCondition is defined and evaluates to false/0
+    const visibleMenuItems = menuItems.filter((item) => {
+        // If showCondition is undefined or empty string, it's considered true
+        if (!item.showCondition || item.showCondition.trim() === '') {
+            return true;
+        }
+
+        // Qlik expressions are evaluated by the engine; for 'string' type properties 
+        // with 'expression: optional', evaluating them to numbers is tricky.
+        // Usually, 0 or empty string means hide.
+        const condition = item.showCondition;
+        return condition !== '0' && condition !== 'false' && condition !== '';
+    });
+
+    visibleMenuItems.forEach((item, idx) => {
         if (idx > 0) {
             const sep = document.createElement('hr');
             sep.className = 'hbqs-popup-separator';
