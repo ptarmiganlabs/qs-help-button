@@ -1,0 +1,1105 @@
+/**
+ * Menu Items — property panel section.
+ *
+ * Includes inline bug-report and feedback configuration per item.
+ *
+ * @module property-panel/menu-items-section
+ */
+
+import { toPickerObj } from "../util/color";
+import {
+  TIMESTAMP_FORMAT_OPTIONS,
+  DEFAULT_DIALOG_FORMAT,
+  DEFAULT_PAYLOAD_FORMAT,
+} from "../util/timestamp-formats";
+
+const menuItemsSection = {
+  type: "items",
+  label: "Menu Items",
+  items: {
+    menuItems: {
+      ref: "menuItems",
+      label: "Menu Items",
+      type: "array",
+      allowAdd: true,
+      allowRemove: true,
+      allowMove: true,
+      addTranslation: "Add Menu Item",
+      itemTitleRef: "label",
+      items: {
+        label: {
+          ref: "label",
+          label: "Label",
+          type: "string",
+          expression: "optional",
+          defaultValue: "New item",
+          maxlength: 128,
+        },
+        action: {
+          ref: "action",
+          label: "Action",
+          type: "string",
+          component: "dropdown",
+          defaultValue: "",
+          options: [
+            { value: "", label: "Open URL" },
+            { value: "bugReport", label: "Open Bug Report dialog" },
+            { value: "feedback", label: "Open Feedback dialog" },
+          ],
+        },
+        url: {
+          ref: "url",
+          label: "URL (supports {{template}} fields)",
+          type: "string",
+          expression: "optional",
+          defaultValue: "https://example.com",
+          maxlength: 2048,
+          show: (item) => !["bugReport", "feedback"].includes(item.action),
+        },
+        target: {
+          ref: "target",
+          label: "Link target",
+          type: "string",
+          component: "dropdown",
+          defaultValue: "_blank",
+          options: [
+            { value: "_blank", label: "New tab" },
+            { value: "_self", label: "Same tab" },
+          ],
+          show: (item) => !["bugReport", "feedback"].includes(item.action),
+        },
+        showCondition: {
+          ref: "showCondition",
+          label: "Show condition",
+          type: "string",
+          expression: "optional",
+          defaultValue: "",
+        },
+        icon: {
+          ref: "icon",
+          label: "Icon",
+          type: "string",
+          component: "dropdown",
+          defaultValue: "help",
+          options: [
+            { value: "help", label: "Help" },
+            { value: "info", label: "Info" },
+            { value: "bug", label: "Bug" },
+            { value: "mail", label: "Mail" },
+            { value: "link", label: "Link" },
+            { value: "star", label: "Star" },
+          ],
+        },
+
+        // -- Bug Report Settings (expandable) --
+        bugReportSettings: {
+          component: "expandable-items",
+          label: "Bug Report Settings",
+          show: (item) => item.action === "bugReport",
+          items: {
+            bugReportMain: {
+              type: "items",
+              label: "Webhook & Auth",
+              items: {
+                webhookUrl: {
+                  ref: "bugReport.webhookUrl",
+                  label: "Webhook URL (POST endpoint)",
+                  type: "string",
+                  expression: "optional",
+                  defaultValue: "",
+                  maxlength: 2048,
+                },
+                authStrategy: {
+                  ref: "bugReport.authStrategy",
+                  label: "Authentication",
+                  type: "string",
+                  component: "dropdown",
+                  defaultValue: "none",
+                  options: [
+                    { value: "none", label: "None" },
+                    { value: "header", label: "Authorization header" },
+                    {
+                      value: "sense-session",
+                      label: "Sense session (XRF key)",
+                    },
+                    { value: "custom", label: "Custom headers" },
+                  ],
+                },
+                authToken: {
+                  ref: "bugReport.authToken",
+                  label: "Bearer token",
+                  type: "string",
+                  expression: "optional",
+                  defaultValue: "",
+                  maxlength: 8192,
+                  show: (item) => item.bugReport?.authStrategy === "header",
+                },
+                bugReportCustomHeaders: {
+                  type: "array",
+                  ref: "bugReport.customHeaders",
+                  label: "Custom headers",
+                  itemTitleRef: "name",
+                  allowAdd: true,
+                  allowRemove: true,
+                  allowMove: true,
+                  addTranslation: "Add Header",
+                  show: (item) => item.bugReport?.authStrategy === "custom",
+                  items: {
+                    name: {
+                      ref: "name",
+                      label: "Header name",
+                      type: "string",
+                      expression: "optional",
+                      defaultValue: "",
+                      maxlength: 256,
+                    },
+                    value: {
+                      ref: "value",
+                      label: "Header value",
+                      type: "string",
+                      expression: "optional",
+                      defaultValue: "",
+                      maxlength: 8192,
+                    },
+                  },
+                },
+              },
+            },
+            bugReportDialog: {
+              type: "items",
+              label: "Dialog Options",
+              items: {
+                brEnableSeverity: {
+                  ref: "bugReport.enableSeverity",
+                  label: "Show severity picker (Low / Medium / High)",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDescriptionMaxLength: {
+                  ref: "bugReport.descriptionMaxLength",
+                  label: "Max description length (characters)",
+                  type: "number",
+                  expression: "optional",
+                  defaultValue: 1000,
+                  min: 1,
+                  max: 16384,
+                },
+                brDialogTitle: {
+                  ref: "bugReport.dialogStrings.title",
+                  label: "Dialog title override (overrides global)",
+                  type: "string",
+                  expression: "optional",
+                  defaultValue: "",
+                  maxlength: 128,
+                },
+                brDialogTimestampFormat: {
+                  ref: "bugReport.dialogTimestampFormat",
+                  label: "Dialog timestamp format",
+                  type: "string",
+                  component: "dropdown",
+                  defaultValue: DEFAULT_DIALOG_FORMAT,
+                  options: TIMESTAMP_FORMAT_OPTIONS,
+                },
+                brPayloadTimestampFormat: {
+                  ref: "bugReport.payloadTimestampFormat",
+                  label: "Payload timestamp format",
+                  type: "string",
+                  component: "dropdown",
+                  defaultValue: DEFAULT_PAYLOAD_FORMAT,
+                  options: TIMESTAMP_FORMAT_OPTIONS,
+                },
+              },
+            },
+            brDialogFieldsSection: {
+              type: "items",
+              label: "Show in Dialog",
+              items: {
+                brDfInfo: {
+                  component: "text",
+                  label: "Fields visible to the user in the bug report dialog.",
+                },
+                brDfUserName: {
+                  ref: "bugReport.dialogFields.userName",
+                  label: "User Name",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfPlatform: {
+                  ref: "bugReport.dialogFields.platform",
+                  label: "Platform",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfAppId: {
+                  ref: "bugReport.dialogFields.appId",
+                  label: "App ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfSheetId: {
+                  ref: "bugReport.dialogFields.sheetId",
+                  label: "Sheet ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfUrlPath: {
+                  ref: "bugReport.dialogFields.urlPath",
+                  label: "URL Path",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfTimestamp: {
+                  ref: "bugReport.dialogFields.timestamp",
+                  label: "Timestamp",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfUserId: {
+                  ref: "bugReport.dialogFields.userId",
+                  label: "User ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfUserDir: {
+                  ref: "bugReport.dialogFields.userDirectory",
+                  label: "User Directory",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfSenseVer: {
+                  ref: "bugReport.dialogFields.senseVersion",
+                  label: "Qlik Sense Version",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfBrowser: {
+                  ref: "bugReport.dialogFields.browser",
+                  label: "Browser",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfTenantId: {
+                  ref: "bugReport.dialogFields.tenantId",
+                  label: "Tenant ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfStatus: {
+                  ref: "bugReport.dialogFields.status",
+                  label: "Status",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfPicture: {
+                  ref: "bugReport.dialogFields.picture",
+                  label: "Picture",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfZoneinfo: {
+                  ref: "bugReport.dialogFields.preferredZoneinfo",
+                  label: "Preferred Zone Info",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brDfRoles: {
+                  ref: "bugReport.dialogFields.roles",
+                  label: "Roles",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+              },
+            },
+            brPayloadFieldsSection: {
+              type: "items",
+              label: "Include in Payload",
+              items: {
+                brPfInfo: {
+                  component: "text",
+                  label:
+                    "Fields included in the webhook POST payload (may differ from dialog).",
+                },
+                brPfUserName: {
+                  ref: "bugReport.payloadFields.userName",
+                  label: "User Name",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfPlatform: {
+                  ref: "bugReport.payloadFields.platform",
+                  label: "Platform",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfAppId: {
+                  ref: "bugReport.payloadFields.appId",
+                  label: "App ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfSheetId: {
+                  ref: "bugReport.payloadFields.sheetId",
+                  label: "Sheet ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfUrlPath: {
+                  ref: "bugReport.payloadFields.urlPath",
+                  label: "URL Path",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfTimestamp: {
+                  ref: "bugReport.payloadFields.timestamp",
+                  label: "Timestamp",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfUserId: {
+                  ref: "bugReport.payloadFields.userId",
+                  label: "User ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfUserDir: {
+                  ref: "bugReport.payloadFields.userDirectory",
+                  label: "User Directory",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfSenseVer: {
+                  ref: "bugReport.payloadFields.senseVersion",
+                  label: "Qlik Sense Version",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfBrowser: {
+                  ref: "bugReport.payloadFields.browser",
+                  label: "Browser",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfTenantId: {
+                  ref: "bugReport.payloadFields.tenantId",
+                  label: "Tenant ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfStatus: {
+                  ref: "bugReport.payloadFields.status",
+                  label: "Status",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfPicture: {
+                  ref: "bugReport.payloadFields.picture",
+                  label: "Picture",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfZoneinfo: {
+                  ref: "bugReport.payloadFields.preferredZoneinfo",
+                  label: "Preferred Zone Info",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                brPfRoles: {
+                  ref: "bugReport.payloadFields.roles",
+                  label: "Roles",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+              },
+            },
+          },
+        },
+
+        // -- Feedback Settings (expandable) --
+        feedbackSettings: {
+          component: "expandable-items",
+          label: "Feedback Settings",
+          show: (item) => item.action === "feedback",
+          items: {
+            feedbackMain: {
+              type: "items",
+              label: "Webhook & Auth",
+              items: {
+                feedbackWebhookUrl: {
+                  ref: "feedback.webhookUrl",
+                  label: "Webhook URL (POST endpoint)",
+                  type: "string",
+                  expression: "optional",
+                  defaultValue: "",
+                  maxlength: 2048,
+                },
+                feedbackAuthStrategy: {
+                  ref: "feedback.authStrategy",
+                  label: "Authentication",
+                  type: "string",
+                  component: "dropdown",
+                  defaultValue: "none",
+                  options: [
+                    { value: "none", label: "None" },
+                    { value: "header", label: "Authorization header" },
+                    {
+                      value: "sense-session",
+                      label: "Sense session (XRF key)",
+                    },
+                    { value: "custom", label: "Custom headers" },
+                  ],
+                },
+                feedbackAuthToken: {
+                  ref: "feedback.authToken",
+                  label: "Bearer token",
+                  type: "string",
+                  expression: "optional",
+                  defaultValue: "",
+                  maxlength: 8192,
+                  show: (item) => item.feedback?.authStrategy === "header",
+                },
+                feedbackCustomHeaders: {
+                  type: "array",
+                  ref: "feedback.customHeaders",
+                  label: "Custom headers",
+                  itemTitleRef: "name",
+                  allowAdd: true,
+                  allowRemove: true,
+                  allowMove: true,
+                  addTranslation: "Add Header",
+                  show: (item) => item.feedback?.authStrategy === "custom",
+                  items: {
+                    name: {
+                      ref: "name",
+                      label: "Header name",
+                      type: "string",
+                      expression: "optional",
+                      defaultValue: "",
+                    },
+                    value: {
+                      ref: "value",
+                      label: "Header value",
+                      type: "string",
+                      expression: "optional",
+                      defaultValue: "",
+                    },
+                  },
+                },
+              },
+            },
+            feedbackDialog: {
+              type: "items",
+              label: "Dialog Options",
+              items: {
+                feedbackEnableRating: {
+                  ref: "feedback.enableRating",
+                  label: "Show star rating (1-5)",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                feedbackEnableComment: {
+                  ref: "feedback.enableComment",
+                  label: "Show free-text comment field",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                feedbackCommentMaxLength: {
+                  ref: "feedback.commentMaxLength",
+                  label: "Max comment length (characters)",
+                  type: "number",
+                  defaultValue: 500,
+                  min: 1,
+                  max: 16384,
+                  show: (item) => item.feedback?.enableComment !== false,
+                },
+                feedbackDialogTitle: {
+                  ref: "feedback.dialogStrings.title",
+                  label: "Dialog title override (overrides global)",
+                  type: "string",
+                  expression: "optional",
+                  defaultValue: "",
+                  maxlength: 128,
+                },
+                feedbackDialogTimestampFormat: {
+                  ref: "feedback.dialogTimestampFormat",
+                  label: "Dialog timestamp format",
+                  type: "string",
+                  component: "dropdown",
+                  defaultValue: DEFAULT_DIALOG_FORMAT,
+                  options: TIMESTAMP_FORMAT_OPTIONS,
+                },
+                feedbackPayloadTimestampFormat: {
+                  ref: "feedback.payloadTimestampFormat",
+                  label: "Payload timestamp format",
+                  type: "string",
+                  component: "dropdown",
+                  defaultValue: DEFAULT_PAYLOAD_FORMAT,
+                  options: TIMESTAMP_FORMAT_OPTIONS,
+                },
+              },
+            },
+            dialogFieldsSection: {
+              type: "items",
+              label: "Show in Dialog",
+              items: {
+                dfInfo: {
+                  component: "text",
+                  label: "Fields visible to the user in the feedback dialog.",
+                },
+                dfUserName: {
+                  ref: "feedback.dialogFields.userName",
+                  label: "User Name",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfPlatform: {
+                  ref: "feedback.dialogFields.platform",
+                  label: "Platform",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfAppId: {
+                  ref: "feedback.dialogFields.appId",
+                  label: "App ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfSheetId: {
+                  ref: "feedback.dialogFields.sheetId",
+                  label: "Sheet ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfUrlPath: {
+                  ref: "feedback.dialogFields.urlPath",
+                  label: "URL Path",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfTimestamp: {
+                  ref: "feedback.dialogFields.timestamp",
+                  label: "Timestamp",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfUserId: {
+                  ref: "feedback.dialogFields.userId",
+                  label: "User ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfUserDir: {
+                  ref: "feedback.dialogFields.userDirectory",
+                  label: "User Directory",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfSenseVer: {
+                  ref: "feedback.dialogFields.senseVersion",
+                  label: "Qlik Sense Version",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfBrowser: {
+                  ref: "feedback.dialogFields.browser",
+                  label: "Browser",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfTenantId: {
+                  ref: "feedback.dialogFields.tenantId",
+                  label: "Tenant ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfStatus: {
+                  ref: "feedback.dialogFields.status",
+                  label: "Status",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfPicture: {
+                  ref: "feedback.dialogFields.picture",
+                  label: "Picture",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfZoneinfo: {
+                  ref: "feedback.dialogFields.preferredZoneinfo",
+                  label: "Preferred Zone Info",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                dfRoles: {
+                  ref: "feedback.dialogFields.roles",
+                  label: "Roles",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+              },
+            },
+            payloadFieldsSection: {
+              type: "items",
+              label: "Include in Payload",
+              items: {
+                pfInfo: {
+                  component: "text",
+                  label:
+                    "Fields included in the webhook POST payload (may differ from dialog).",
+                },
+                pfUserName: {
+                  ref: "feedback.payloadFields.userName",
+                  label: "User Name",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfPlatform: {
+                  ref: "feedback.payloadFields.platform",
+                  label: "Platform",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfAppId: {
+                  ref: "feedback.payloadFields.appId",
+                  label: "App ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfSheetId: {
+                  ref: "feedback.payloadFields.sheetId",
+                  label: "Sheet ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfUrlPath: {
+                  ref: "feedback.payloadFields.urlPath",
+                  label: "URL Path",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfTimestamp: {
+                  ref: "feedback.payloadFields.timestamp",
+                  label: "Timestamp",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: true,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfUserId: {
+                  ref: "feedback.payloadFields.userId",
+                  label: "User ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfUserDir: {
+                  ref: "feedback.payloadFields.userDirectory",
+                  label: "User Directory",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfSenseVer: {
+                  ref: "feedback.payloadFields.senseVersion",
+                  label: "Qlik Sense Version",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfBrowser: {
+                  ref: "feedback.payloadFields.browser",
+                  label: "Browser",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfTenantId: {
+                  ref: "feedback.payloadFields.tenantId",
+                  label: "Tenant ID",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfStatus: {
+                  ref: "feedback.payloadFields.status",
+                  label: "Status",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfPicture: {
+                  ref: "feedback.payloadFields.picture",
+                  label: "Picture",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfZoneinfo: {
+                  ref: "feedback.payloadFields.preferredZoneinfo",
+                  label: "Preferred Zone Info",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+                pfRoles: {
+                  ref: "feedback.payloadFields.roles",
+                  label: "Roles",
+                  type: "boolean",
+                  component: "switch",
+                  defaultValue: false,
+                  options: [
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ],
+                },
+              },
+            },
+          },
+        },
+
+        // -- Per-item colors (expandable) --
+        itemColors: {
+          component: "expandable-items",
+          label: "Item Colors",
+          items: {
+            itemColorsMain: {
+              type: "items",
+              label: "Colors",
+              items: {
+                iconColor: {
+                  ref: "iconColor",
+                  label: "Icon",
+                  type: "object",
+                  component: "color-picker",
+                  defaultValue: toPickerObj("#165a9b"),
+                },
+                bgColor: {
+                  ref: "bgColor",
+                  label: "Background",
+                  type: "object",
+                  component: "color-picker",
+                  defaultValue: toPickerObj("#f0f6fc"),
+                },
+                bgColorHover: {
+                  ref: "bgColorHover",
+                  label: "Hover background",
+                  type: "object",
+                  component: "color-picker",
+                  defaultValue: toPickerObj("#dbeafe"),
+                },
+                textColor: {
+                  ref: "textColor",
+                  label: "Text",
+                  type: "object",
+                  component: "color-picker",
+                  defaultValue: toPickerObj("#0c3256"),
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+export default menuItemsSection;
