@@ -12,11 +12,15 @@ const aboutSection = {
   items: {
     headerText: {
       component: "text",
-      label: `HelpButton.qs v${PACKAGE_VERSION}\nConfigurable help button for Qlik Sense.`,
+      label: `HelpButton.qs v${PACKAGE_VERSION}`,
     },
     buildDate: {
       component: "text",
       label: `Built ${BUILD_DATE}`,
+    },
+    description: {
+      component: "text",
+      label: "Configurable help button for Qlik Sense apps. Brought to you by Ptarmigan Labs.",
     },
     linkGithub: {
       component: "link",

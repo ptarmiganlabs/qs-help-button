@@ -344,11 +344,11 @@ function openAboutModal() {
                 <span class="hbqs-about-modal__icon">${makeSvg('help', 28, '#165a9b')}</span>
                 <span class="hbqs-about-modal__title">HelpButton.qs</span>
                 <span class="hbqs-about-modal__version">v${escapeHtml(PACKAGE_VERSION)}</span>
+                <p class="hbqs-about-modal__build-date">Built ${escapeHtml(BUILD_DATE)}</p>
             </div>
             <p class="hbqs-about-modal__tagline">
                 Configurable help button for Qlik Sense apps.
             </p>
-            <p class="hbqs-about-modal__build-date">Built ${escapeHtml(BUILD_DATE)}</p>
             <div class="hbqs-about-modal__links">
                 <a href="https://github.com/ptarmiganlabs/help-button.qs" target="_blank" rel="noopener noreferrer">
                     <strong>Documentation &amp; Source Code</strong>
