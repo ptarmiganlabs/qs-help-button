@@ -28,7 +28,7 @@ import { fetchTemplateContext } from './util/template-fields';
 import { resolveText, setForceLocale } from './i18n/index';
 import { escapeHtml } from './util/template-fields';
 import { applyPresetToNewTooltips } from './theme/presets';
-import logger, { PACKAGE_VERSION } from './util/logger';
+import logger, { PACKAGE_VERSION, BUILD_DATE } from './util/logger';
 import './style.css';
 
 export default function supernova(galaxy) {
@@ -344,6 +344,7 @@ function openAboutModal() {
                 <span class="hbqs-about-modal__icon">${makeSvg('help', 28, '#165a9b')}</span>
                 <span class="hbqs-about-modal__title">HelpButton.qs</span>
                 <span class="hbqs-about-modal__version">v${escapeHtml(PACKAGE_VERSION)}</span>
+                <p class="hbqs-about-modal__build-date">Built ${escapeHtml(BUILD_DATE)}</p>
             </div>
             <p class="hbqs-about-modal__tagline">
                 Configurable help button for Qlik Sense apps.
