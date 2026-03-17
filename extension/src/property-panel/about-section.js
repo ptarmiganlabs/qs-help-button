@@ -4,7 +4,7 @@
  * @module property-panel/about-section
  */
 
-import { PACKAGE_VERSION } from "../util/logger";
+import { PACKAGE_VERSION, BUILD_DATE } from "../util/logger";
 
 const aboutSection = {
   type: "items",
@@ -13,6 +13,10 @@ const aboutSection = {
     headerText: {
       component: "text",
       label: `HelpButton.qs v${PACKAGE_VERSION}\nConfigurable help button for Qlik Sense.`,
+    },
+    buildDate: {
+      component: "text",
+      label: `Built ${BUILD_DATE}`,
     },
     linkGithub: {
       component: "link",

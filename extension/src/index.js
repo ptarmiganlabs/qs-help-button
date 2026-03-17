@@ -28,7 +28,7 @@ import { fetchTemplateContext } from './util/template-fields';
 import { resolveText, setForceLocale } from './i18n/index';
 import { escapeHtml } from './util/template-fields';
 import { applyPresetToNewTooltips } from './theme/presets';
-import logger, { PACKAGE_VERSION } from './util/logger';
+import logger, { PACKAGE_VERSION, BUILD_DATE } from './util/logger';
 import './style.css';
 
 export default function supernova(galaxy) {
@@ -348,6 +348,7 @@ function openAboutModal() {
             <p class="hbqs-about-modal__tagline">
                 Configurable help button for Qlik Sense apps.
             </p>
+            <p class="hbqs-about-modal__build-date">Built ${escapeHtml(BUILD_DATE)}</p>
             <div class="hbqs-about-modal__links">
                 <a href="https://github.com/ptarmiganlabs/help-button.qs" target="_blank" rel="noopener noreferrer">
                     <strong>Documentation &amp; Source Code</strong>

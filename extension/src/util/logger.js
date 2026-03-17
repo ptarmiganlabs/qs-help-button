@@ -5,6 +5,7 @@
 
 export const BUILD_TYPE = __BUILD_TYPE__;
 export const PACKAGE_VERSION = __PACKAGE_VERSION__;
+export const BUILD_DATE = __BUILD_DATE__;
 
 const IS_PRODUCTION = BUILD_TYPE === 'production';
 
