@@ -143,6 +143,19 @@ export function createPopupMenu(triggerButton, config) {
                 closePopup();
                 onSetVariable(item.variableAction || {});
             });
+        } else if (item.action === 'setVariable') {
+            // Explicitly handle setVariable without a callback to avoid falling back to generic URL (#) handling
+            menuItem.href = '#';
+            menuItem.setAttribute('aria-disabled', 'true');
+            menuItem.classList.add('hbqs-popup-item--disabled');
+            menuItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                logger.warn(
+                    'HelpButton.qs popup: "setVariable" menu item clicked but no onSetVariable handler was provided. Label: ' +
+                        (item.label || '')
+                );
+            });
         } else {
             const itemUrl = item.url || '#';
             const itemTarget = item.target || '_blank';
