@@ -179,9 +179,9 @@ export function injectHelpButton(layout, adapter, platform, app) {
         onFeedback: feedbackConfig
             ? () => openFeedbackDialog(feedbackConfig, platform.type)
             : undefined,
-        onSetVariable: app
-            ? (variableConfig) => executeVariableAction(app, variableConfig)
-            : undefined,
+        onSetVariable: function (variableConfig) {
+            executeVariableAction(app, variableConfig);
+        },
     });
     activePopup = popupControls;
 
