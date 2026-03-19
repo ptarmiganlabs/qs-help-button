@@ -1062,3 +1062,228 @@
     border-left: 3px solid #d1d5db;
     background: #f9fafb;
 }
+
+/* ===================================================================
+   Markdown Editor Dialog (property-panel "Open editor" button)
+   =================================================================== */
+
+.hbqs-md-editor-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10003;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hbqs-md-editor-dialog {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 900px;
+    max-width: 92vw;
+    max-height: 88vh;
+}
+
+/* -- Header -- */
+.hbqs-md-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+    flex-shrink: 0;
+}
+
+.hbqs-md-editor-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.hbqs-md-editor-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+}
+
+.hbqs-md-editor-close:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+/* -- Toolbar -- */
+.hbqs-md-editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 18px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fafbfc;
+    flex-shrink: 0;
+}
+
+.hbqs-md-editor-toolbar-btn {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    line-height: 1;
+}
+
+.hbqs-md-editor-toolbar-btn:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+    color: #111827;
+}
+
+.hbqs-md-editor-toolbar-btn:active {
+    background: #d1d5db;
+}
+
+.hbqs-md-editor-toolbar-sep {
+    width: 1px;
+    height: 18px;
+    background: #d1d5db;
+    margin: 0 6px;
+}
+
+/* -- Body (split editor + preview) -- */
+.hbqs-md-editor-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.hbqs-md-editor-editor-pane,
+.hbqs-md-editor-preview-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.hbqs-md-editor-editor-pane {
+    border-right: 1px solid #e5e7eb;
+}
+
+.hbqs-md-editor-pane-label {
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.hbqs-md-editor-textarea {
+    flex: 1;
+    width: 100%;
+    border: none;
+    padding: 14px;
+    font-size: 13px;
+    font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    line-height: 1.6;
+    color: #1f2937;
+    resize: none;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.hbqs-md-editor-textarea:focus {
+    background: #fefffe;
+}
+
+.hbqs-md-editor-counter {
+    padding: 4px 14px;
+    font-size: 11px;
+    color: #9ca3af;
+    text-align: right;
+    border-top: 1px solid #f3f4f6;
+    flex-shrink: 0;
+}
+
+.hbqs-md-editor-counter--warn {
+    color: #dc2626;
+}
+
+.hbqs-md-editor-preview {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+/* -- Footer -- */
+.hbqs-md-editor-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 18px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+    flex-shrink: 0;
+}
+
+.hbqs-md-editor-btn {
+    padding: 7px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+}
+
+.hbqs-md-editor-btn:hover {
+    background: #f3f4f6;
+}
+
+.hbqs-md-editor-btn--save {
+    background: #165a9b;
+    color: #ffffff;
+    border-color: #165a9b;
+}
+
+.hbqs-md-editor-btn--save:hover {
+    background: #124a83;
+}
+
+/* -- Responsive: stack panes vertically on narrow viewports -- */
+@media (max-width: 640px) {
+    .hbqs-md-editor-body {
+        flex-direction: column;
+    }
+    .hbqs-md-editor-editor-pane {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+}

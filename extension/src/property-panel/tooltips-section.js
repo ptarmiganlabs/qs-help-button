@@ -9,6 +9,7 @@
 
 import { toPickerObj } from "../util/color";
 import { ICON_NAMES } from "../ui/icons";
+import { openMarkdownEditor } from "../ui/markdown-editor-dialog";
 
 export default function tooltipsSection(getObjectList) {
   return {
@@ -257,6 +258,20 @@ export default function tooltipsSection(getObjectList) {
                     defaultValue: "",
                     maxlength: 256,
                   },
+                  hoverContentEditor: {
+                    label: "Open Markdown editor",
+                    component: "button",
+                    action(data) {
+                      openMarkdownEditor({
+                        value: data.hoverContent || "",
+                        maxlength: 256,
+                        title: "Edit Hover Content",
+                        onSave(newValue) {
+                          data.hoverContent = newValue;
+                        },
+                      });
+                    },
+                  },
                 },
               },
             },
@@ -300,6 +315,21 @@ export default function tooltipsSection(getObjectList) {
                     defaultValue: "",
                     maxlength: 16384,
                     show: (item) => item.dialogEnabled !== false,
+                  },
+                  dialogContentEditor: {
+                    label: "Open Markdown editor",
+                    component: "button",
+                    show: (item) => item.dialogEnabled !== false,
+                    action(data) {
+                      openMarkdownEditor({
+                        value: data.dialogContent || "",
+                        maxlength: 16384,
+                        title: "Edit Dialog Content",
+                        onSave(newValue) {
+                          data.dialogContent = newValue;
+                        },
+                      });
+                    },
                   },
                   dialogSize: {
                     ref: "dialogSize",
