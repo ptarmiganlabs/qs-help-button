@@ -268,7 +268,9 @@ function enableDrag(iconEl, parentEl) {
     function onPointerDown(e) {
         // Only handle primary button
         if (e.button !== 0) return;
-        e.preventDefault();
+        // Do NOT preventDefault here — it would suppress focus-on-click for the
+        // focusable icon element (tabindex="0"), breaking :focus-visible behaviour.
+        // Text-selection during drag is prevented by setPointerCapture() below.
 
         toAbsoluteLeftTop();
 
@@ -282,6 +284,7 @@ function enableDrag(iconEl, parentEl) {
         iconEl.setPointerCapture(e.pointerId);
         iconEl.addEventListener('pointermove', onPointerMove);
         iconEl.addEventListener('pointerup', onPointerUp);
+        iconEl.addEventListener('pointercancel', onPointerCancel);
     }
 
     function onPointerMove(e) {
@@ -290,6 +293,8 @@ function enableDrag(iconEl, parentEl) {
 
         if (!dragging) {
             if (Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
+            // Drag confirmed — prevent text selection from this point onward.
+            e.preventDefault();
             dragging = true;
             didDrag = true;
             iconEl.classList.add('hbqs-tooltip-trigger--dragging');
@@ -310,12 +315,26 @@ function enableDrag(iconEl, parentEl) {
         iconEl.style.top = `${newTop}px`;
     }
 
-    function onPointerUp(e) {
+    function cleanupDrag(e) {
         iconEl.releasePointerCapture(e.pointerId);
         iconEl.removeEventListener('pointermove', onPointerMove);
         iconEl.removeEventListener('pointerup', onPointerUp);
+        iconEl.removeEventListener('pointercancel', onPointerCancel);
         iconEl.classList.remove('hbqs-tooltip-trigger--dragging');
         dragging = false;
+    }
+
+    function onPointerUp(e) {
+        cleanupDrag(e);
+        // didDrag intentionally left true — the click handler clears it once it
+        // fires (capture phase), so the dialog-open click is suppressed correctly.
+    }
+
+    function onPointerCancel(e) {
+        cleanupDrag(e);
+        // No click will follow a pointercancel, so reset didDrag explicitly to
+        // avoid permanently suppressing the next real click.
+        didDrag = false;
     }
 
     iconEl.addEventListener('pointerdown', onPointerDown);
