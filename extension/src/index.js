@@ -251,6 +251,12 @@ export default function supernova(galaxy) {
                     hoverMenuTarget.classList.add('hbqs-no-hover-menu');
                 }
 
+                // Completely hide the widget (grid cell) in analysis mode
+                const hideWidget = layout.widget?.hideWidget === true;
+                if (hideWidget) {
+                    qlikWrapper.classList.add('hbqs-hidden-widget');
+                }
+
                 return () => {
                     if (contextMenuHandler) {
                         qlikWrapper.removeEventListener('contextmenu', contextMenuHandler, true);
@@ -262,6 +268,7 @@ export default function supernova(galaxy) {
                     if (hoverMenuTarget) {
                         hoverMenuTarget.classList.remove('hbqs-no-hover-menu');
                     }
+                    qlikWrapper.classList.remove('hbqs-hidden-widget');
                     destroyTooltips();
                 };
             }, [platform, adapter, layout, isEditMode, app]);
