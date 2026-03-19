@@ -171,10 +171,10 @@ function mountTooltipIcon(item, targetEl, index) {
     iconEl.innerHTML = makeSvg(item.iconName || 'info', iconSize, iconColor);
 
     // Position
-    applyPosition(iconEl, item.iconPosition || 'top-right');
+    applyPosition(iconEl, item);
 
-    // Enable drag-to-move when position is 'floating'
-    if (item.iconPosition === 'floating') {
+    // Enable drag-to-move when floating toggle is on
+    if (item.iconFloating) {
         iconEl.classList.add('hbqs-tooltip-trigger--floating');
         enableDrag(iconEl, targetEl);
     }
@@ -233,7 +233,7 @@ function mountTooltipIcon(item, targetEl, index) {
     }
 
     targetEl.appendChild(iconEl);
-    logger.debug(`Tooltip "${item.tooltipLabel}" mounted on target (position: ${item.iconPosition})`);
+    logger.debug(`Tooltip "${item.tooltipLabel}" mounted on target (position: ${item.iconPosition}${item.iconFloating ? ', floating' : ''})`);
 }
 
 /**
@@ -334,12 +334,14 @@ function enableDrag(iconEl, parentEl) {
 }
 
 /**
- * Apply CSS position offsets for the icon based on the position name.
+ * Apply CSS position offsets for the icon based on the position config.
  *
  * @param {HTMLElement} iconEl - The tooltip icon element.
- * @param {string} position - Position name (e.g. 'top-right', 'center-left').
+ * @param {object} item - Tooltip configuration item.
  */
-function applyPosition(iconEl, position) {
+function applyPosition(iconEl, item) {
+    const position = item.iconPosition || 'top-right';
+
     // Reset
     iconEl.style.top = '';
     iconEl.style.bottom = '';
@@ -384,11 +386,17 @@ function applyPosition(iconEl, position) {
             iconEl.style.bottom = '4px';
             iconEl.style.right = '4px';
             break;
-        case 'floating':
-            // Start at top-right; the user can drag to reposition
-            iconEl.style.top = '4px';
-            iconEl.style.right = '4px';
+        case 'percentage': {
+            const rawX = item.iconPositionX;
+            const rawY = item.iconPositionY;
+            logger.debug(`Percentage position — raw iconPositionX: ${rawX} (${typeof rawX}), iconPositionY: ${rawY} (${typeof rawY})`);
+            const x = Math.max(0, Math.min(100, Number(rawX) || 50));
+            const y = Math.max(0, Math.min(100, Number(rawY) || 50));
+            iconEl.style.left = `${x}%`;
+            iconEl.style.top = `${y}%`;
+            iconEl.style.setProperty('--hbqs-tt-translate', 'translate(-50%, -50%)');
             break;
+        }
         default:
             iconEl.style.top = '4px';
             iconEl.style.right = '4px';
