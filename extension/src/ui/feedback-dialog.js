@@ -16,6 +16,7 @@ import { resolveText } from '../i18n/index';
 import logger from '../util/logger';
 import { fetchSenseVersionLabel } from '../util/product-info';
 import { formatTimestamp, DEFAULT_DIALOG_FORMAT, DEFAULT_PAYLOAD_FORMAT } from '../util/timestamp-formats';
+import { attachMarkdownShortcuts } from '../util/markdown-shortcuts';
 
 // ---------------------------------------------------------------------------
 // Field labels — maps internal field keys to user-visible labels.
@@ -313,6 +314,7 @@ export function openFeedbackDialog(config, platformType) {
                 commentTextarea.maxLength = commentMaxLength;
             }
             commentGroup.appendChild(commentTextarea);
+            attachMarkdownShortcuts(commentTextarea);
 
             // Character counter
             if (commentMaxLength > 0) {
