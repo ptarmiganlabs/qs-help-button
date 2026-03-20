@@ -4,6 +4,12 @@
  * Renders tooltip trigger icons on Qlik Sense chart objects or arbitrary
  * CSS-selected elements. Each icon shows a hover popup and optionally
  * opens a detail dialog on click.
+ *
+ * Multi-instance support: when several HelpButton.qs extension objects
+ * live on the same sheet, each registers its tooltips via
+ * `registerTooltips()`.  The module merges all registered tooltip arrays
+ * and injects them together so all tooltip icons appear regardless of
+ * the number of extension objects.
  */
 
 import { makeSvg } from './icons';
@@ -35,6 +41,70 @@ let pendingItems = [];
  * Intentionally NOT cleared in destroyTooltips() so positions persist.
  */
 const draggedPositions = new Map();
+
+// ---------------------------------------------------------------------------
+// Multi-instance tooltip registry
+// ---------------------------------------------------------------------------
+
+/**
+ * Registry of tooltips contributed by each HelpButton.qs extension object.
+ * Key = object ID (layout.qInfo.qId), value = { layout, adapter, platform }.
+ *
+ * @type {Map<string, { layout: object, adapter: object, platform: object }>}
+ */
+const tooltipRegistry = new Map();
+
+/**
+ * Register tooltips from one HelpButton.qs extension object and re-inject
+ * the merged tooltip set.
+ *
+ * @param {string} objectId - Unique object ID (layout.qInfo.qId).
+ * @param {object} layout - Extension layout containing `tooltips[]`.
+ * @param {object} adapter - Platform adapter module.
+ * @param {{ type: string, codePath: string }} platform - Platform detection result.
+ */
+export function registerTooltips(objectId, layout, adapter, platform) {
+    tooltipRegistry.set(objectId, { layout, adapter, platform });
+    rebuildTooltips();
+}
+
+/**
+ * Unregister tooltips for a specific HelpButton.qs object and re-inject
+ * (or clear) the remaining tooltips.
+ *
+ * @param {string} objectId - Unique object ID.
+ */
+export function unregisterTooltips(objectId) {
+    tooltipRegistry.delete(objectId);
+    if (tooltipRegistry.size === 0) {
+        destroyTooltips();
+    } else {
+        rebuildTooltips();
+    }
+}
+
+/**
+ * Rebuild tooltips by merging tooltip arrays from all registered objects
+ * and calling the core `injectTooltips` function with a merged layout.
+ */
+function rebuildTooltips() {
+    if (tooltipRegistry.size === 0) return;
+
+    const entries = [...tooltipRegistry.values()];
+    // Use the first entry's adapter and platform
+    const { adapter, platform } = entries[0];
+
+    // Merge all tooltip arrays
+    const mergedTooltips = [];
+    for (const { layout } of entries) {
+        const items = layout.tooltips || [];
+        mergedTooltips.push(...items);
+    }
+
+    // Build a merged layout for the core injector
+    const mergedLayout = { ...entries[0].layout, tooltips: mergedTooltips };
+    injectTooltips(mergedLayout, adapter, platform);
+}
 
 /**
  * Inject all tooltip icons defined in the layout.

@@ -22,8 +22,8 @@ import {
 import ext from './ext';
 import definition from './object-properties';
 import { detectPlatform, getPlatformAdapter } from './platform/index';
-import { injectHelpButton } from './ui/toolbar-injector';
-import { injectTooltips, destroyTooltips } from './ui/tooltip-injector';
+import { registerHelpConfig, unregisterHelpConfig } from './ui/toolbar-injector';
+import { registerTooltips, unregisterTooltips } from './ui/tooltip-injector';
 import { makeSvg } from './ui/icons';
 import { fetchTemplateContext } from './util/template-fields';
 import { resolveText, setForceLocale } from './i18n/index';
@@ -165,11 +165,12 @@ export default function supernova(galaxy) {
 
                     // Keep toolbar button visible while editing
                     if (app) {
-                        injectHelpButton(layout, adapter, platform, app);
+                        registerHelpConfig(layout.qInfo.qId, layout, adapter, platform, app);
                     }
 
                     return () => {
                         if (resizeObserver) resizeObserver.disconnect();
+                        unregisterHelpConfig(layout.qInfo.qId);
                     };
                 }
 
@@ -177,15 +178,15 @@ export default function supernova(galaxy) {
                 renderAnalysisPlaceholder(element, layout);
 
                 if (app) {
-                    injectHelpButton(layout, adapter, platform, app);
+                    registerHelpConfig(layout.qInfo.qId, layout, adapter, platform, app);
                 }
                 // No cleanup returned — the button is a page-level singleton
                 // that must survive component unmount on sheet navigation.
-                // injectHelpButton() handles updates via its double-injection guard.
+                // registerHelpConfig() handles updates via the config registry.
                 // watchForRemoval() handles re-injection after SPA navigation.
 
                 // Inject tooltip icons onto chart objects / CSS targets
-                injectTooltips(layout, adapter, platform);
+                registerTooltips(layout.qInfo.qId, layout, adapter, platform);
 
                 // --- Context menu & hover menu visibility overrides ---
                 const hideContextMenu = layout.widget?.hideContextMenu === true;
@@ -273,7 +274,8 @@ export default function supernova(galaxy) {
                     }
                     qlikWrapper.classList.remove('hbqs-hidden-widget');
                     qlikWrapper.removeAttribute('aria-hidden');
-                    destroyTooltips();
+                    unregisterTooltips(layout.qInfo.qId);
+                    unregisterHelpConfig(layout.qInfo.qId);
                 };
             }, [platform, adapter, layout, isEditMode, app]);
 
