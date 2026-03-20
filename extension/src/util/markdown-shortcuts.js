@@ -164,7 +164,40 @@ function toggleLinePrefix(textarea, prefix) {
 }
 
 // ---------------------------------------------------------------------------
-// Public API
+// Public API — individual formatting actions (for toolbar buttons)
+// ---------------------------------------------------------------------------
+
+/** @param {HTMLTextAreaElement} ta */
+export function applyBold(ta) {
+  wrapSelection(ta, "**", "**", "bold");
+}
+/** @param {HTMLTextAreaElement} ta */
+export function applyItalic(ta) {
+  wrapSelection(ta, "*", "*", "italic");
+}
+/** @param {HTMLTextAreaElement} ta */
+export function applyCode(ta) {
+  wrapSelection(ta, "`", "`", "code");
+}
+/** @param {HTMLTextAreaElement} ta */
+export function applyLink(ta) {
+  insertLink(ta);
+}
+/** @param {HTMLTextAreaElement} ta */
+export function applyOrderedList(ta) {
+  toggleLinePrefix(ta, "ol");
+}
+/** @param {HTMLTextAreaElement} ta */
+export function applyUnorderedList(ta) {
+  toggleLinePrefix(ta, "- ");
+}
+/** @param {HTMLTextAreaElement} ta */
+export function applyBlockquote(ta) {
+  toggleLinePrefix(ta, "> ");
+}
+
+// ---------------------------------------------------------------------------
+// Public API — keyboard shortcut listener
 // ---------------------------------------------------------------------------
 
 /**
