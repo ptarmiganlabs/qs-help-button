@@ -113,16 +113,13 @@ jobs:
           echo "=== Bug-report variant ==="
           zipinfo "${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip"
 
-      - name: Install Chromium
-        run: sudo apt-get install -y chromium-browser
-
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
 
-      - name: Install md-to-pdf
-        run: npm install -g md-to-pdf
+      - name: Install PDF tools
+        run: PUPPETEER_SKIP_DOWNLOAD=true npm install -g md-to-pdf@5.2.4 @mermaid-js/mermaid-cli@11.12.0
 
       - name: Build extension
         run: |
@@ -132,9 +129,26 @@ jobs:
 
       - name: Generate README PDF
         run: |
+          # ubuntu-latest ships google-chrome-stable; use it for both mmdc and md-to-pdf
+          CHROME=$(which google-chrome-stable 2>/dev/null || which chromium-browser 2>/dev/null || which chromium)
+          echo "Chrome executable: $CHROME"
+
+          # Write puppeteer config for mmdc
+          echo "{\"executablePath\":\"$CHROME\",\"args\":[\"--no-sandbox\",\"--disable-setuid-sandbox\"]}" > /tmp/mmdc-puppeteer.json
+
           cd extension
-          PUPPETEER_EXECUTABLE_PATH=$(which chromium-browser 2>/dev/null || which chromium) \
-            md-to-pdf README.md
+
+          # Step 1: convert Mermaid code blocks to SVG images
+          mmdc -i README.md -o README-processed.md --puppeteerConfigFile /tmp/mmdc-puppeteer.json
+
+          # Step 2: render the processed markdown (with inline SVG refs) to PDF
+          # md-to-pdf always names the output after the input (README-processed.pdf)
+          PUPPETEER_EXECUTABLE_PATH="$CHROME" md-to-pdf README-processed.md
+
+          # Clean up intermediate artefacts and give the PDF its final name
+          rm -f README-processed.md README-processed-*.svg
+          mv README-processed.pdf README.pdf
+          echo "PDF size: $(du -sh README.pdf)"
 
       - name: Create extension release zip
         run: |
