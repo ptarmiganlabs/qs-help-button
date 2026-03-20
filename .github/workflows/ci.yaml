@@ -113,16 +113,28 @@ jobs:
           echo "=== Bug-report variant ==="
           zipinfo "${DIST_FILE_NAME}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip"
 
+      - name: Install Chromium
+        run: sudo apt-get install -y chromium-browser
+
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
+
+      - name: Install md-to-pdf
+        run: npm install -g md-to-pdf
 
       - name: Build extension
         run: |
           cd extension
           PUPPETEER_SKIP_DOWNLOAD=true npm ci
           npm run pack:prod
+
+      - name: Generate README PDF
+        run: |
+          cd extension
+          PUPPETEER_EXECUTABLE_PATH=$(which chromium-browser 2>/dev/null || which chromium) \
+            md-to-pdf README.md
 
       - name: Create extension release zip
         run: |
@@ -134,6 +146,8 @@ jobs:
           # Create outer zip containing the extension zip + readme + license
           zip -j "${DIST_FILE_NAME}-extension-v${VERSION}.zip" \
             extension/helpbutton-qs.zip \
+            extension/README.md \
+            extension/README.pdf \
             readme.txt \
             LICENSE
 
