@@ -27,11 +27,24 @@ jobs:
       - name: Show github.ref
         run: echo "$GITHUB_REF"
 
+      - name: Show release-please job variables
+        run: |
+          echo "=== Trigger ==="
+          echo "github.ref         : ${{ github.ref }}"
+          echo "github.ref_name    : ${{ github.ref_name }}"
+          echo "github.event_name  : ${{ github.event_name }}"
+          echo "github.repository  : ${{ github.repository }}"
+          echo "github.sha         : ${{ github.sha }}"
+          echo ""
+          echo "=== Pre-release detection ==="
+          echo "IS_PRERELEASE_BRANCH: $IS_PRERELEASE_BRANCH"
+
       - name: Determine config file
         id: config
         run: |
           if [ "$IS_PRERELEASE_BRANCH" = "true" ]; then
             PRERELEASE_TYPE="${GITHUB_REF#refs/heads/pre-release/}"
+            echo "PRERELEASE_TYPE    : $PRERELEASE_TYPE"
             case "$PRERELEASE_TYPE" in
               alpha|beta|rc)
                 echo "config_file=release-please-prerelease-${PRERELEASE_TYPE}.json" >> $GITHUB_OUTPUT
@@ -45,6 +58,10 @@ jobs:
             echo "config_file=release-please-config.json" >> $GITHUB_OUTPUT
             echo "target_branch=main" >> $GITHUB_OUTPUT
           fi
+
+          echo ""
+          echo "=== Release-please config ==="
+          cat $GITHUB_OUTPUT
 
       - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4.4.0
         id: release
@@ -86,6 +103,24 @@ jobs:
       DIST_FILE_NAME: helpbutton-qs
       IS_PRERELEASE: ${{ startsWith(github.ref, 'refs/heads/pre-release/') }}
     steps:
+      - name: Show build-release job variables
+        run: |
+          echo "=== Trigger ==="
+          echo "github.ref         : ${{ github.ref }}"
+          echo "github.ref_name    : ${{ github.ref_name }}"
+          echo "github.sha         : ${{ github.sha }}"
+          echo ""
+          echo "=== Build flags ==="
+          echo "DIST_FILE_NAME     : $DIST_FILE_NAME"
+          echo "IS_PRERELEASE      : $IS_PRERELEASE"
+          echo ""
+          echo "=== Release-please outputs ==="
+          echo "releases_created   : ${{ needs.release-please.outputs.releases_created }}"
+          echo "release_tag_name   : ${{ needs.release-please.outputs.release_tag_name }}"
+          echo "release_version    : ${{ needs.release-please.outputs.release_version }}"
+          echo "release_upload_url : ${{ needs.release-please.outputs.release_upload_url }}"
+          echo "is_prerelease      : ${{ needs.release-please.outputs.is_prerelease }}"
+
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -206,3 +241,34 @@ jobs:
             ${{ env.DIST_FILE_NAME }}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip
             ${{ env.DIST_FILE_NAME }}-extension-v${{ needs.release-please.outputs.release_version }}.zip
           prerelease: ${{ env.IS_PRERELEASE }}
+
+      - name: Fix pre-release name to include type suffix
+        if: env.IS_PRERELEASE == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_PAT }}
+          VERSION: ${{ needs.release-please.outputs.release_version }}
+          TAG: ${{ needs.release-please.outputs.release_tag_name }}
+        run: |
+          PRERELEASE_TYPE="${GITHUB_REF#refs/heads/pre-release/}"
+          case "$PRERELEASE_TYPE" in
+            alpha|beta|rc) ;;
+            *) echo "Unknown prerelease type '$PRERELEASE_TYPE', skipping rename"; exit 0 ;;
+          esac
+
+          # If release-please already added the suffix (e.g. 2.5.1-rc.0), nothing to do
+          if [[ "$VERSION" == *"-${PRERELEASE_TYPE}."* ]]; then
+            echo "Version $VERSION already has correct -${PRERELEASE_TYPE}.N suffix, no rename needed"
+            exit 0
+          fi
+
+          # Derive the prerelease counter from the existing release name, defaulting to 0
+          CURRENT_NAME=$(gh release view "$TAG" --json name -q .name)
+          if [[ "$CURRENT_NAME" =~ -${PRERELEASE_TYPE}\.([0-9]+)$ ]]; then
+            N="${BASH_REMATCH[1]}"
+          else
+            N=0
+          fi
+
+          NEW_NAME="helpbutton-qs: v${VERSION}-${PRERELEASE_TYPE}.${N}"
+          echo "Renaming release '$CURRENT_NAME' → '$NEW_NAME'"
+          gh release edit "$TAG" --title "$NEW_NAME"
