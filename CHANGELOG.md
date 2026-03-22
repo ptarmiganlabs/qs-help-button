@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.5.0](https://github.com/ptarmiganlabs/help-button.qs/compare/helpbutton-qs-v2.4.0...helpbutton-qs-v2.5.0) (2026-03-22)
+
+
+### Features
+
+* Add support for multiple HelpButton.qs objects on same app sheet ([412686a](https://github.com/ptarmiganlabs/help-button.qs/commit/412686afa8fde208fbd8e1e8be287dacbc44a474))
+* Enhance CI workflow for pre-release support and add pre-release documentation ([774d40e](https://github.com/ptarmiganlabs/help-button.qs/commit/774d40e917169cc9311b97c37e37f971db6daed0))
+
 ## [2.4.0](https://github.com/ptarmiganlabs/help-button.qs/compare/helpbutton-qs-v2.3.0...helpbutton-qs-v2.4.0) (2026-03-20)
 
 
