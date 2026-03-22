@@ -2,6 +2,21 @@
 
 This repository provides different solutions for adding a customized help button into the Qlik Sense application toolbar. The help button gives users quick access to context-aware support resources, documentation, bug reporting tools and user feedback forms directly within the Qlik Sense interface.
 
+## ❤️ Support the project
+
+If you find this project helpful and use it in your Qlik Sense environment, please consider supporting it financially! Your sponsorship helps ensure the project's long-term sustainability and allows me to continue maintaining it, fixing bugs, and adding new features.
+
+**👉 [Sponsor the project on GitHub](https://github.com/sponsors/ptarmiganlabs)** - Click the "Sponsor" button at the repository page to become a sponsor.
+
+* ⭐ **Star the repository** on GitHub - it helps others discover the project
+* 🍴 **Fork and contribute** - pull requests are welcome!
+* 💬 **Share your feedback** - let me know how you're using it
+* 🐛 **Report issues** - help improve stability and functionality
+
+*This project is maintained by [Göran Sander](https://github.com/mountaindude) and supported by [Ptarmigan Labs](https://ptarmiganlabs.com).*
+
+---
+
 The bug report and feedback features look like this in action:
 
 ![Qlik Sense Help Button Demo](./docs/helpbutton-qs_animated-demo-2.gif)

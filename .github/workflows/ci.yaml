@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'pre-release/**'
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
@@ -17,21 +18,34 @@ jobs:
       release_tag_name: ${{ steps.release.outputs['tag_name'] }}
       release_version: ${{ steps.release.outputs['version'] }}
       release_upload_url: ${{ steps.release.outputs['upload_url'] }}
+      is_prerelease: ${{ steps.release.outputs['prerelease'] }}
     env:
       GITHUB_REF: ${{ github.ref }}
       GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_PAT }}
+      IS_PRERELEASE_BRANCH: ${{ startsWith(github.ref, 'refs/heads/pre-release/') }}
     steps:
       - name: Show github.ref
         run: echo "$GITHUB_REF"
+
+      - name: Determine config file
+        id: config
+        run: |
+          if [ "$IS_PRERELEASE_BRANCH" = "true" ]; then
+            echo "config_file=release-please-prerelease.json" >> $GITHUB_OUTPUT
+            echo "target_branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+          else
+            echo "config_file=release-please-config.json" >> $GITHUB_OUTPUT
+            echo "target_branch=main" >> $GITHUB_OUTPUT
+          fi
 
       - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4.4.0
         id: release
         if: github.repository_owner == 'ptarmiganlabs'
         with:
           token: ${{ secrets.RELEASE_PLEASE_PAT }}
-          config-file: release-please-config.json
+          config-file: ${{ steps.config.outputs.config_file }}
           manifest-file: .release-please-manifest.json
-          target-branch: main
+          target-branch: ${{ steps.config.outputs.target_branch }}
 
       - name: Show output from Release-Please
         if: always()
@@ -62,6 +76,7 @@ jobs:
       contents: write
     env:
       DIST_FILE_NAME: helpbutton-qs
+      IS_PRERELEASE: ${{ startsWith(github.ref, 'refs/heads/pre-release/') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -182,3 +197,4 @@ jobs:
             ${{ env.DIST_FILE_NAME }}-basic-v${{ needs.release-please.outputs.release_version }}.zip
             ${{ env.DIST_FILE_NAME }}-bug-report-v${{ needs.release-please.outputs.release_version }}.zip
             ${{ env.DIST_FILE_NAME }}-extension-v${{ needs.release-please.outputs.release_version }}.zip
+          prerelease: ${{ env.IS_PRERELEASE }}
